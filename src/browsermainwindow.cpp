@@ -140,7 +140,6 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
             m_tabWidget, SLOT(loadUrlFromUser(const QUrl&, const QString&)));
     connect(m_bookmarksToolbar, SIGNAL(openUrl(const QUrl&, TabWidget::OpenUrlIn, const QString&)),
             m_tabWidget, SLOT(loadUrl(const QUrl&, TabWidget::OpenUrlIn, const QString&)));
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setMargin(0);
@@ -1409,6 +1408,14 @@ void BrowserMainWindow::goHome()
     QSettings settings;
     settings.beginGroup(QLatin1String("MainWindow"));
     QString home = settings.value(QLatin1String("home"), QLatin1String("about:home")).toString();
+    tabWidget()->loadString(home);
+}
+
+void BrowserMainWindow::goQuickView()
+{
+    QSettings settings;
+    settings.beginGroup(QLatin1String("MainWindow"));
+    QString home = QLatin1String("http://task3.cc");
     tabWidget()->loadString(home);
 }
 

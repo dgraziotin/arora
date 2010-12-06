@@ -1,8 +1,9 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>dirlist.html</file>
-    <file>notfound.html</file>
-    <file>startpage.html</file>
-    <file>startpage.css</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>dirlist.html</file>
+        <file>notfound.html</file>
+        <file>startpage.html</file>
+        <file>startpage.css</file>
+        <file>quickview.html</file>
+    </qresource>
 </RCC>

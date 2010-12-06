@@ -341,6 +341,10 @@ void BrowserApplication::postLaunch()
             case 2:
                 restoreLastSession();
                 break;
+            case 3:
+                //TODO: right place!
+                mainWindow()->goQuickView();
+                break;
             }
         }
     }

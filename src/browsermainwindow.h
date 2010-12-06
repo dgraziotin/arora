@@ -104,6 +104,7 @@ public:
 
 public slots:
     void goHome();
+    void goQuickView();
     void privacyChanged(bool isPrivate);
     void zoomTextOnlyChanged(bool textOnly);
 

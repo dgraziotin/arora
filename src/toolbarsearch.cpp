@@ -251,9 +251,7 @@ void ToolbarSearch::searchNow()
     Q_ASSERT(engine);
     if (!engine)
         return;
-
     QString searchText = text();
-
     QWebSettings *globalSettings = QWebSettings::globalSettings();
     if (!globalSettings->testAttribute(QWebSettings::PrivateBrowsingEnabled)) {
         QStringList newList = m_recentSearches;

@@ -47,6 +47,7 @@ HEADERS += \
     modelmenu.h \
     modeltoolbar.h \
     plaintexteditsearch.h \
+    quickview.h \
     searchbar.h \
     searchbutton.h \
     searchlineedit.h \
@@ -75,6 +76,7 @@ SOURCES += \
     modelmenu.cpp \
     modeltoolbar.cpp \
     plaintexteditsearch.cpp \
+    quickview.cpp \
     searchbar.cpp \
     searchbutton.cpp \
     searchlineedit.cpp \
