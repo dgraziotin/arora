@@ -11,6 +11,7 @@ SUBDIRS  = \
     opensearchmanager \
     opensearchreader \
     opensearchwriter \
+    quickview \
     searchlineedit \
     tabbar \
     tabwidget \

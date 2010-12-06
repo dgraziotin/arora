@@ -30,6 +30,9 @@
 #include <qtimer.h>
 #include <qwebsettings.h>
 
+/**QList<HistoryEntry> QuickView::getLastSixHistoryEntries(){
+    return 0;
+}*/
 
 /*
 void FileAccessReply::listDirectory()

@@ -20,15 +20,15 @@
 #ifndef QUICKVIEW_H
 #define QUICKVIEW_H
 
-#include "schemeaccesshandler.h"
 
 #include <qbuffer.h>
-#include <qnetworkreply.h>
+#include "history/historymanager.h"
 
 class QuickView
 {
 public:
     QuickView(QObject *parent = 0);
+    QList<HistoryEntry> getLastSixHistoryEntries();
 };
 
 #endif // QUICKVIEW_H
