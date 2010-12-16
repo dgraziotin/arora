@@ -27,8 +27,11 @@
 class QuickView
 {
 public:
-    QuickView(QObject *parent = 0);
-    QList<HistoryEntry> getLastSixHistoryEntries();
+    QuickView();
+    //QuickView(QObject *parent = 0);
+    QList<HistoryEntry> getLastHistoryEntries(QList<HistoryEntry> history, int numberEntries);
+    QString getHtmlMessage(QList<HistoryEntry> history);
+    void render(QString htmlMessage);
 };
 
 #endif // QUICKVIEW_H

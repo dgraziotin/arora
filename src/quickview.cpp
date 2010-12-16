@@ -18,22 +18,68 @@
  */
 
 #include "quickview.h"
-
+#include "fileaccesshandler.h"
 #include <qapplication.h>
 #include <qcryptographichash.h>
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qfileiconprovider.h>
+#include <QNetworkRequest>
 #include <qhash.h>
 #include <qstyle.h>
 #include <qtextstream.h>
 #include <qtimer.h>
 #include <qwebsettings.h>
+#include <historymanager.h>
+#include <QTextStream>
 
-/**QList<HistoryEntry> QuickView::getLastSixHistoryEntries(){
-    return 0;
-}*/
+QuickView::QuickView(){}
 
+QList<HistoryEntry> QuickView::getLastHistoryEntries(QList<HistoryEntry> history, int numberEntries){
+    if(history.isEmpty())
+        return QList<HistoryEntry>();
+    if(history.count() < numberEntries)
+        numberEntries = history.count();
+
+    int historyLength = history.count();
+    int lastSixPosition = historyLength - numberEntries;
+
+    QList<HistoryEntry> lastSix = history.mid(lastSixPosition,-1);
+    return lastSix;
+}
+
+QString QuickView::getHtmlMessage(QList<HistoryEntry> history){
+    if(history.isEmpty())
+        return QString();
+    QString link = QLatin1String("<p><a href=\"%1\">%2</a></p>");
+    for(int i = 0;i < history.length();i++)
+        link += link.arg(history.at(i).url, history.at(i).title);
+    return link;
+}
+
+void QuickView::render(QString htmlMessage){
+    // Save result to buffer
+    //QBuffer buffer;
+    //QTextStream stream(&buffer);
+    //stream << htmlMessage;
+    //stream.flush();
+    //buffer.reset();
+    // Publish result
+    //setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("text/html"));
+    //setHeader(QNetworkRequest::ContentLengthHeader, buffer.bytesAvailable());
+    //setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
+    //setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, QByteArray("Ok"));
+    //emit metaDataChanged();
+    //emit downloadProgress(buffer.size(), buffer.size());
+
+    //if (errorCode != QNetworkReply::NoError) {
+    //    emit error(errorCode);
+    //} else if (buffer.size() > 0) {
+    //    emit readyRead();
+    //}
+
+    //emit finished();
+}
 /*
 void FileAccessReply::listDirectory()
 {
@@ -132,6 +178,4 @@ void FileAccessReply::listDirectory()
 
     emit finished();
 }
-
 */
-

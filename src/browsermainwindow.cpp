@@ -1415,7 +1415,7 @@ void BrowserMainWindow::goQuickView()
 {
     QSettings settings;
     settings.beginGroup(QLatin1String("MainWindow"));
-    QString home = QLatin1String("http://task3.cc");
+    QString home = QLatin1String("qrc:/quickview.html");
     tabWidget()->loadString(home);
 }
 

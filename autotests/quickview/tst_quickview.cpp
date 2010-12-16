@@ -24,6 +24,14 @@
 #include <history.h>
 #include <historycompleter.h>
 #include <modeltest.h>
+#include <quickview.h>
+#include <sstream>
+#include <iostream>
+#include <QMessageBox>
+#include <QAbstractTableModel>
+#include <QModelIndex>
+
+using namespace std;
 
 class tst_QuickView : public QObject
 {
@@ -37,7 +45,9 @@ public slots:
 
 private slots:
 	void historyLength();
-
+	void getLastSixHistoryEntries();
+	//void getHtmlMessage();
+	void getReallyLast();
 
 
 public:
@@ -69,26 +79,7 @@ public:
 // It is only called once.
 void tst_QuickView::initTestCase()
 {
-    QCoreApplication::setApplicationName("historytest");
-    QFile file("myhistory.txt");
-    if (!file.open(QFile::ReadOnly)) {
-        qWarning() << "couldn't open file:" << file.fileName();
-        return;
     }
-    QTextStream stream(&file);
-
-    QList<HistoryEntry> list;
-    do {
-        QString url = stream.readLine();
-        QString title = stream.readLine();
-        QString date = stream.readLine();
-        QDateTime dateTime = QDateTime::fromString(date);
-        QVERIFY(dateTime.isValid());
-        HistoryEntry item(url, dateTime, title);
-        list.prepend(item);
-    } while (!stream.atEnd());
-    m_history = list;
-}
 
 
 // This will be called after the last test function is executed.
@@ -110,9 +101,53 @@ void tst_QuickView::cleanup()
 // At this point, our history contains six elements
 void tst_QuickView::historyLength()
 {
-	QCOMPARE(m_history.count(),6);
+	QCOMPARE(m_history.count(),0);
+	for (int i=0; i<10; i++){
+		QString s;
+		std::stringstream out;
+		out << "http://foo.com/" << i;
+		s = QString::fromStdString(out.str());
+		HistoryEntry item = HistoryEntry(s, QDateTime::currentDateTime().addDays(-1 - i));
+		m_history << item;
+	}
+	QCOMPARE(m_history.count(),10);
 }
 
+void tst_QuickView::getLastSixHistoryEntries()
+{
+	QuickView quickView;
+	QList<HistoryEntry> lastSix = quickView.getLastHistoryEntries(m_history,6);
+	QCOMPARE(lastSix.count(),6);
+	cout << "---" << endl;
+	for(int i=0; i < lastSix.count(); i++)
+		cout << lastSix.value(i).url.toStdString() << " - " << lastSix.value(i).dateTime.toString().toStdString() << endl;
+}
+
+/*
+void tst_QuickView::getHtmlMessage()
+{
+    QMessageBox msgBox;
+    QuickView quickView;
+    QList<HistoryEntry> lastSix = quickView.getLastHistoryEntries(m_history,6);
+    QString htmlMessage = quickView.getHtmlMessage(lastSix);
+    QCOMPARE(htmlMessage.isNull(),false);
+    msgBox.setText(htmlMessage);
+    msgBox.exec();
+}
+ */
+
+void tst_QuickView::getReallyLast()
+{
+	//BrowserApplication application(argc, argv);
+	HistoryFilterModel* model = BrowserApplication::historyManager()->historyFilterModel();
+	int rowCount = model->rowCount();
+	cout << "Dinga Dinga" << endl;
+	for (int i = 0; i < rowCount; i++) {
+		QModelIndex index = model->index(i,0,QModelIndex());
+		cout << index.data(HistoryModel::UrlRole).toString().toStdString();
+		cout << " - " << index.data(HistoryFilterModel::FrecencyRole).toInt() << endl;
+	}
+}
 
 QTEST_MAIN(tst_QuickView)
 #include "tst_quickview.moc"

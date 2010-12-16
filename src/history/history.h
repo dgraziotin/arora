@@ -118,7 +118,7 @@ public:
     HistoryFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
 
     inline bool historyContains(const QString &url) const
-        { load(); return m_historyHash.contains(url); }
+        { return m_historyHash.contains(url); }
     int historyLocation(const QString &url) const;
 
     enum Roles {
