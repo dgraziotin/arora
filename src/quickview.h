@@ -21,17 +21,21 @@
 #define QUICKVIEW_H
 
 
-#include <qbuffer.h>
-#include "history/historymanager.h"
+#include <qdatetime.h>
+#include <qhash.h>
+#include <qobject.h>
+#include <qsortfilterproxymodel.h>
+#include <qtimer.h>
+#include <qurl.h>
+#include <history.h>
+#include <historymanager.h>
+#include <qwebhistoryinterface.h>
 
-class QuickView
-{
+
+class QuickView {
 public:
-    QuickView();
-    //QuickView(QObject *parent = 0);
-    QList<HistoryEntry> getLastHistoryEntries(QList<HistoryEntry> history, int numberEntries);
+    QList<HistoryEntry> getLastHistoryEntries(int numberEntries);
     QString getHtmlMessage(QList<HistoryEntry> history);
-    void render(QString htmlMessage);
 };
 
 #endif // QUICKVIEW_H

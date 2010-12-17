@@ -45,10 +45,8 @@ public slots:
 
 private slots:
 	void historyLength();
-	void getLastSixHistoryEntries();
-	//void getHtmlMessage();
-	void getReallyLast();
-
+	void getMostVisited();
+	
 
 public:
     QList<HistoryEntry> m_history;
@@ -113,41 +111,18 @@ void tst_QuickView::historyLength()
 	QCOMPARE(m_history.count(),10);
 }
 
-void tst_QuickView::getLastSixHistoryEntries()
+void tst_QuickView::getMostVisited()
 {
 	QuickView quickView;
-	QList<HistoryEntry> lastSix = quickView.getLastHistoryEntries(m_history,6);
-	QCOMPARE(lastSix.count(),6);
-	cout << "---" << endl;
-	for(int i=0; i < lastSix.count(); i++)
-		cout << lastSix.value(i).url.toStdString() << " - " << lastSix.value(i).dateTime.toString().toStdString() << endl;
-}
-
-/*
-void tst_QuickView::getHtmlMessage()
-{
-    QMessageBox msgBox;
-    QuickView quickView;
-    QList<HistoryEntry> lastSix = quickView.getLastHistoryEntries(m_history,6);
-    QString htmlMessage = quickView.getHtmlMessage(lastSix);
-    QCOMPARE(htmlMessage.isNull(),false);
-    msgBox.setText(htmlMessage);
-    msgBox.exec();
-}
- */
-
-void tst_QuickView::getReallyLast()
-{
-	//BrowserApplication application(argc, argv);
-	HistoryFilterModel* model = BrowserApplication::historyManager()->historyFilterModel();
-	int rowCount = model->rowCount();
-	cout << "Dinga Dinga" << endl;
-	for (int i = 0; i < rowCount; i++) {
-		QModelIndex index = model->index(i,0,QModelIndex());
-		cout << index.data(HistoryModel::UrlRole).toString().toStdString();
-		cout << " - " << index.data(HistoryFilterModel::FrecencyRole).toInt() << endl;
+	QList<HistoryEntry> last = quickView.getLastHistoryEntries(6);
+	for (int i = 0; i < last.size(); i++) {
+		cout << last.at(i).title.toStdString() << endl;
 	}
+	
+	cout << endl << "--------" << endl;
+	cout << quickView.getHtmlMessage(last).toStdString();
 }
+
 
 QTEST_MAIN(tst_QuickView)
 #include "tst_quickview.moc"

@@ -203,6 +203,75 @@ private:
     HistoryTreeModel *m_treeModel;
 };
 
+/*!
+    Proxy model that will remove any duplicate entries.
+    Both m_sourceRow and m_historyHash store their offsets not from
+    the front of the list, but as offsets from the back.
+  */
+class QuickViewFilterModel : public QAbstractProxyModel
+{
+    Q_OBJECT
+
+public:
+    QuickViewFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
+
+    inline bool historyContains(const QString &url) const
+        { return m_historyHash.contains(url); }
+    int historyLocation(const QString &url) const;
+
+    enum Roles {
+        FrecencyRole = HistoryModel::MaxRole + 1,
+        MaxRole = FrecencyRole
+    };
+
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+    void setSourceModel(QAbstractItemModel *sourceModel);
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QModelIndex index(int, int, const QModelIndex &parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    void recalculateFrecencies();
+
+private slots:
+    void sourceReset();
+    void sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void sourceRowsInserted(const QModelIndex &parent, int start, int end);
+    void sourceRowsRemoved(const QModelIndex &, int, int);
+
+private:
+    void load() const;
+
+    struct HistoryData {
+        int tailOffset;
+        int frecency;
+
+        HistoryData(int off, int f = 0) : tailOffset(off), frecency(f) { }
+
+        bool operator==(const HistoryData &other) const {
+            return (tailOffset == other.tailOffset)
+                && (frecency == -1 || other.frecency == -1 || frecency == other.frecency);
+        }
+        bool operator!=(const HistoryData &other) const {
+            return !(*this == other);
+        }
+        // like the actual history entries, our index mapping data is sorted in reverse
+        bool operator<(const HistoryData &other) const {
+            return (tailOffset > other.tailOffset);
+        }
+    };
+    int frecencyScore(const QModelIndex &sourceIndex) const;
+
+    mutable QList<HistoryData> m_filteredRows;
+    mutable QHash<QString, int> m_historyHash;
+    mutable bool m_loaded;
+    mutable QDateTime m_scaleTime;
+};
+
 // Menu that is dynamically populated from the history
 class HistoryMenu : public ModelMenu
 {

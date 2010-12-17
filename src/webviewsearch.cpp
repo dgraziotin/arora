@@ -93,9 +93,7 @@ WebViewWithSearch::WebViewWithSearch(WebView *webView, QWidget *parent)
     int startup = settings.value(QLatin1String("startupBehavior")).toInt();
 
     if(startup==3){
-        QuickView quickView;
-        QByteArray result(quickView.getHtmlMessage(quickView.getLastHistoryEntries(BrowserApplication::historyManager()->history(),6)).toLatin1());
-        m_webView->setContent(result);
+       //
     }
 
     layout->setSpacing(0);

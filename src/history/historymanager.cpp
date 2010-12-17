@@ -98,6 +98,7 @@ HistoryManager::HistoryManager(QObject *parent)
     , m_historyModel(0)
     , m_historyFilterModel(0)
     , m_historyTreeModel(0)
+    , m_quickViewFilterModel(0)
 {
     m_expiredTimer.setSingleShot(true);
     connect(&m_expiredTimer, SIGNAL(timeout()),
@@ -113,6 +114,7 @@ HistoryManager::HistoryManager(QObject *parent)
 
     m_historyModel = new HistoryModel(this, this);
     m_historyFilterModel = new HistoryFilterModel(m_historyModel, this);
+    m_quickViewFilterModel = new QuickViewFilterModel(m_historyModel, this);
     m_historyTreeModel = new HistoryTreeModel(m_historyFilterModel, this);
 
     // QWebHistoryInterface will delete the history manager
@@ -180,6 +182,12 @@ HistoryTreeModel *HistoryManager::historyTreeModel() const
 {
     return m_historyTreeModel;
 }
+
+QuickViewFilterModel *HistoryManager::quickViewFilterModel() const
+{
+    return m_quickViewFilterModel;
+}
+
 
 void HistoryManager::checkForExpired()
 {

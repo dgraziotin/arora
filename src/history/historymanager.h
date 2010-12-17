@@ -97,6 +97,7 @@ class AutoSaver;
 class HistoryModel;
 class HistoryFilterModel;
 class HistoryTreeModel;
+class QuickViewFilterModel;
 class HistoryManager : public QWebHistoryInterface
 {
     Q_OBJECT
@@ -128,6 +129,7 @@ public:
     HistoryModel *historyModel() const;
     HistoryFilterModel *historyFilterModel() const;
     HistoryTreeModel *historyTreeModel() const;
+    QuickViewFilterModel *quickViewFilterModel() const;
 
 public slots:
     void clear();
@@ -158,6 +160,7 @@ private:
     HistoryModel *m_historyModel;
     HistoryFilterModel *m_historyFilterModel;
     HistoryTreeModel *m_historyTreeModel;
+    QuickViewFilterModel *m_quickViewFilterModel;
 };
 
 #endif // HISTORYMANAGER_H
