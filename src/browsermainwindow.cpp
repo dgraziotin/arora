@@ -88,6 +88,7 @@
 #include "useragentmenu.h"
 #include "webview.h"
 #include "webviewsearch.h"
+#include "quickview.h"
 
 #include <qdesktopwidget.h>
 #include <qevent.h>
@@ -109,6 +110,7 @@
 #include <qwebhistory.h>
 
 #include <qdebug.h>
+#include <qbuffer.h>
 
 BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
@@ -1202,6 +1204,8 @@ void BrowserMainWindow::fileNew()
 
     if (startup == 0)
         window->goHome();
+    if (startup == 3)
+        window->goQuickView();
 }
 
 void BrowserMainWindow::fileOpen()
@@ -1413,10 +1417,8 @@ void BrowserMainWindow::goHome()
 
 void BrowserMainWindow::goQuickView()
 {
-    QSettings settings;
-    settings.beginGroup(QLatin1String("MainWindow"));
-    QString home = QLatin1String("qrc:/quickview.html");
-    tabWidget()->loadString(home);
+    QuickView quickView;
+    tabWidget()->currentWebView()->setContent(quickView.render(6));
 }
 
 void BrowserMainWindow::webSearch()

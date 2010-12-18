@@ -22,7 +22,7 @@
 #include <history.h>
 #include <historymanager.h>
 #include <QDateTime>
-
+#include <QFile>
 QList<HistoryEntry> QuickView::getLastHistoryEntries(int numberEntries){
 
     if (numberEntries < 1)
@@ -52,11 +52,35 @@ QList<HistoryEntry> QuickView::getLastHistoryEntries(int numberEntries){
     return list;
 }
 
-QString QuickView::getHtmlMessage(QList<HistoryEntry> history){
-    if(history.isEmpty())
-        return QString();
-    QString link = QLatin1String("<p><a href=\"%1\">%2</a></p>");
-    for(int i = 0;i < history.length();i++)
-            link += link.arg(history.at(i).url, history.at(i).title);
-    return link;
+QString QuickView::getHtmlMessage(QList<HistoryEntry> mostVisited){
+    if(mostVisited.isEmpty())
+        return QLatin1String("<p>No recent websites</p>");
+    QString htmlMessage;
+    QString linkFormat = QLatin1String("<p><a href=\"%1\">%2</a></p>");
+    for(int i = 0; i < mostVisited.size(); i++){
+        QString entry = linkFormat.arg(mostVisited.at(i).url, mostVisited.at(i).title);
+        htmlMessage += entry;
+    }
+    return htmlMessage;
 }
+
+
+QByteArray QuickView::getHtmlPage(QString htmlMessage){
+        QuickView quickView;
+        QFile quickViewPage(QLatin1String(":/quickview.html"));
+        if (!quickViewPage.open(QIODevice::ReadOnly))
+            return QByteArray("");
+
+        QString html = QLatin1String(quickViewPage.readAll());
+
+        QString quickViewEntries = quickView.getHtmlMessage(quickView.getLastHistoryEntries(6));
+        html = html.arg(quickViewEntries);
+        return QByteArray(html.toLatin1());
+}
+
+QByteArray QuickView::render(int numberEntries){
+    QList<HistoryEntry> mostVisited = getLastHistoryEntries(numberEntries);
+    QString mostVisitedHtmlEntries = getHtmlMessage(mostVisited);
+    return getHtmlPage(mostVisitedHtmlEntries);
+}
+

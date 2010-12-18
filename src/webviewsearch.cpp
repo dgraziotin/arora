@@ -31,6 +31,8 @@
 
 #include <quickview.h>
 #include <browserapplication.h>
+#include <qbuffer.h>
+#include <qfile.h>
 
 WebViewSearch::WebViewSearch(QWebView *webView, QWidget *parent)
     : SearchBar(parent)
@@ -92,8 +94,9 @@ WebViewWithSearch::WebViewWithSearch(WebView *webView, QWidget *parent)
     settings.beginGroup(QLatin1String("MainWindow"));
     int startup = settings.value(QLatin1String("startupBehavior")).toInt();
 
-    if(startup==3){
-       //
+    if(startup == 3){
+        QuickView quickView;
+        m_webView->setContent(quickView.render(6));
     }
 
     layout->setSpacing(0);

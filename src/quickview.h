@@ -36,6 +36,8 @@ class QuickView {
 public:
     QList<HistoryEntry> getLastHistoryEntries(int numberEntries);
     QString getHtmlMessage(QList<HistoryEntry> history);
+    QByteArray getHtmlPage(QString htmlMessage);
+    QByteArray render(int numberEntries);
 };
 
 #endif // QUICKVIEW_H

@@ -1,7 +1,7 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <html>
 <head>
-<title>%1</title>
+<title>QuickView</title>
 <style>
 body {
   padding: 1em 0em;
@@ -71,24 +71,12 @@ body:not(.showDotFiles) .hidden {
   padding-left: 48px;
 }
 </style>
-<script type="text/javascript">
-function showHide()
-{
-    if (document.body.className.indexOf("showDotFiles") != -1)
-        document.body.className = document.body.className.replace("showDotFiles", "");
-    else
-        document.body.className += " showDotFiles";
-}
-</script>
 </head>
 <body>
   <div id="box">
-    <h1>%2</h1>
-    <div class='showHide'>
-        <input type="checkbox" onchange="showHide()" name="Show Hidden Files"/> %5
-    </div>
+    <!-- <h1>%2</h1> -->
     <table>
-%4
+%1
     </table>
   </div>
 </body>

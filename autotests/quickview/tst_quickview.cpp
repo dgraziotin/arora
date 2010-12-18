@@ -114,13 +114,9 @@ void tst_QuickView::historyLength()
 void tst_QuickView::getMostVisited()
 {
 	QuickView quickView;
-	QList<HistoryEntry> last = quickView.getLastHistoryEntries(6);
-	for (int i = 0; i < last.size(); i++) {
-		cout << last.at(i).title.toStdString() << endl;
-	}
-	
-	cout << endl << "--------" << endl;
-	cout << quickView.getHtmlMessage(last).toStdString();
+	int desiredLastPages = 6;
+	QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+	QVERIFY(last.size() <= desiredLastPages);
 }
 
 
