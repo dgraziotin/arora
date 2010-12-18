@@ -58,7 +58,10 @@ QString QuickView::getHtmlMessage(QList<HistoryEntry> mostVisited){
     QString htmlMessage;
     QString linkFormat = QLatin1String("<p><a href=\"%1\">%2</a></p>");
     for(int i = 0; i < mostVisited.size(); i++){
-        QString entry = linkFormat.arg(mostVisited.at(i).url, mostVisited.at(i).title);
+        QUrl entryUrl(mostVisited.at(i).url);
+        QString finalUrl = entryUrl.scheme() + QString::fromLatin1("://") + entryUrl.host();
+        QString finalTitle = entryUrl.host();
+        QString entry = linkFormat.arg(finalUrl, finalTitle);
         htmlMessage += entry;
     }
     return htmlMessage;

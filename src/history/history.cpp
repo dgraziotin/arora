@@ -985,10 +985,11 @@ QuickViewFilterModel::QuickViewFilterModel(QAbstractItemModel *sourceModel, QObj
 int QuickViewFilterModel::historyLocation(const QString &url) const
 {
     load();
-    if (!m_historyHash.contains(url))
+    const QUrl qUrl(url);
+    if (!m_historyHash.contains(qUrl.host()))
         return 0;
 
-    return sourceModel()->rowCount() - m_historyHash.value(url);
+    return sourceModel()->rowCount() - m_historyHash.value(qUrl.host());
 }
 
 QVariant QuickViewFilterModel::data(const QModelIndex &index, int role) const
@@ -1071,7 +1072,8 @@ QModelIndex QuickViewFilterModel::mapFromSource(const QModelIndex &sourceIndex) 
 {
     load();
     QString url = sourceIndex.data(HistoryModel::UrlStringRole).toString();
-    if (!m_historyHash.contains(url))
+    const QUrl qUrl(url);
+    if (!m_historyHash.contains(qUrl.host()))
         return QModelIndex();
 
     int sourceOffset = sourceModel()->rowCount() - sourceIndex.row();
@@ -1114,14 +1116,14 @@ void QuickViewFilterModel::load() const
         const QUrl qUrl(url);
         // we keep Arora's internal URLs away from here
         if(isValid(qUrl)){
-            if (!m_historyHash.contains(url)) {
+            if (!m_historyHash.contains(qUrl.host())) {
                 int sourceOffset = sourceModel()->rowCount() - i;
                 m_filteredRows.append(HistoryData(sourceOffset, frecencyScore(idx)));
-                m_historyHash.insert(url, sourceOffset);
+                m_historyHash.insert(qUrl.host(), sourceOffset);
             } else {
                 // we already know about this url: just increment its frecency score
                 QList<HistoryData>::iterator pos = qBinaryFind(m_filteredRows.begin(),
-                    m_filteredRows.end(), HistoryData(m_historyHash[url], -1));
+                    m_filteredRows.end(), HistoryData(m_historyHash[qUrl.host()], -1));
                 Q_ASSERT(pos != m_filteredRows.end());
                 pos->frecency += frecencyScore(idx);
             }
@@ -1138,21 +1140,22 @@ void QuickViewFilterModel::sourceRowsInserted(const QModelIndex &parent, int sta
         return;
     QModelIndex idx = sourceModel()->index(start, 0, parent);
     QString url = idx.data(HistoryModel::UrlStringRole).toString();
+    const QUrl qUrl(url);
     int currentFrecency = 0;
-    if (m_historyHash.contains(url)) {
+    if (m_historyHash.contains(qUrl.host())) {
         QList<HistoryData>::iterator pos = qBinaryFind(m_filteredRows.begin(),
-            m_filteredRows.end(), HistoryData(m_historyHash[url], -1));
+            m_filteredRows.end(), HistoryData(m_historyHash[qUrl.host()], -1));
         Q_ASSERT(pos != m_filteredRows.end());
         int realRow = pos - m_filteredRows.begin();
         currentFrecency = pos->frecency;
         beginRemoveRows(QModelIndex(), realRow, realRow);
         m_filteredRows.erase(pos);
-        m_historyHash.remove(url);
+        m_historyHash.remove(qUrl.host());
         endRemoveRows();
     }
     beginInsertRows(QModelIndex(), 0, 0);
     m_filteredRows.insert(0, HistoryData(sourceModel()->rowCount(), frecencyScore(idx) + currentFrecency));
-    m_historyHash.insert(url, sourceModel()->rowCount());
+    m_historyHash.insert(qUrl.host(), sourceModel()->rowCount());
     endInsertRows();
 }
 
