@@ -1111,16 +1111,20 @@ void QuickViewFilterModel::load() const
     for (int i = 0; i < sourceModel()->rowCount(); ++i) {
         QModelIndex idx = sourceModel()->index(i, 0);
         QString url = idx.data(HistoryModel::UrlStringRole).toString();
-        if (!m_historyHash.contains(url)) {
-            int sourceOffset = sourceModel()->rowCount() - i;
-            m_filteredRows.append(HistoryData(sourceOffset, frecencyScore(idx)));
-            m_historyHash.insert(url, sourceOffset);
-        } else {
-            // we already know about this url: just increment its frecency score
-            QList<HistoryData>::iterator pos = qBinaryFind(m_filteredRows.begin(),
-                m_filteredRows.end(), HistoryData(m_historyHash[url], -1));
-            Q_ASSERT(pos != m_filteredRows.end());
-            pos->frecency += frecencyScore(idx);
+        const QUrl qUrl(url);
+        // we keep Arora's internal URLs away from here
+        if(isValid(qUrl)){
+            if (!m_historyHash.contains(url)) {
+                int sourceOffset = sourceModel()->rowCount() - i;
+                m_filteredRows.append(HistoryData(sourceOffset, frecencyScore(idx)));
+                m_historyHash.insert(url, sourceOffset);
+            } else {
+                // we already know about this url: just increment its frecency score
+                QList<HistoryData>::iterator pos = qBinaryFind(m_filteredRows.begin(),
+                    m_filteredRows.end(), HistoryData(m_historyHash[url], -1));
+                Q_ASSERT(pos != m_filteredRows.end());
+                pos->frecency += frecencyScore(idx);
+            }
         }
     }
     m_loaded = true;
@@ -1182,6 +1186,10 @@ bool QuickViewFilterModel::removeRows(int row, int count, const QModelIndex &par
     if (oldCount - count != rowCount())
         reset();
     return true;
+}
+
+bool QuickViewFilterModel::isValid(const QUrl url) const{
+    return !url.isEmpty() && url.isValid() && !url.toString().contains(QString::fromLatin1("qrc:/")) && !url.toString().contains(QString::fromLatin1("about:"));
 }
 
 int QuickViewFilterModel::frecencyScore(const QModelIndex &sourceIndex) const

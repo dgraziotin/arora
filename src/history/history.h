@@ -234,7 +234,7 @@ public:
     QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
+    bool isValid(const QUrl url) const;
     void recalculateFrecencies();
 
 private slots:

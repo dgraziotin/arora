@@ -1,7 +1,7 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <html>
 <head>
-<title>QuickView</title>
+<title>Arora - QuickView</title>
 <style>
 body {
   padding: 1em 0em;
@@ -26,7 +26,6 @@ h1 {
   font-size: 130%;
   font-weight: bold;
   border-bottom: 1px solid lightgray;
-  margin-left: 48px;
 }
 h2 {
   font-size: 100%;
@@ -59,7 +58,7 @@ table {
   white-space: pre-wrap;
   width: 100%
 }
-%3
+
 #reloadButton {
   padding-left: 48px;
 }
@@ -70,14 +69,17 @@ body:not(.showDotFiles) .hidden {
   font-size: 80%;
   padding-left: 48px;
 }
+
+a, a:hover, a:visited {
+	color:blue;
+	text-decoration: underline;
+}
 </style>
 </head>
 <body>
   <div id="box">
-    <!-- <h1>%2</h1> -->
-    <table>
-%1
-    </table>
+    <h1>Most Visited</h1>
+	%1
   </div>
 </body>
 </html>
