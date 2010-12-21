@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-#include <QtTest/QtTest>
+#include <QtTest>
 #include "qtest_arora.h"
 
 #include <historymanager.h>
@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QAbstractTableModel>
 #include <QModelIndex>
+#include <limits.h>
 
 using namespace std;
 
@@ -44,71 +45,49 @@ public slots:
     void cleanup();
 
 private slots:
-	void historyLength();
+        // BEGIN: tests against real history
 	void getMostVisited();
+        void getLastHistoryEntries();
+        void getHtmlMessage();
+        void render();
+        // END
+        // BEGIN: tests against fake history
+        void verifyFilterCount();
+        void verifyFilterFrecencies();
 	
 
 public:
     QList<HistoryEntry> m_history;
 };
 
-// Subclass that exposes the protected functions.
-class SubHistory : public HistoryManager
-{
-public:
-    SubHistory() : HistoryManager()
-    {
-        QWidget w;
-        setParent(&w);
-        if (QWebHistoryInterface::defaultInterface() == this)
-            QWebHistoryInterface::setDefaultInterface(0);
-        setParent(0);
-    }
 
-    ~SubHistory() {
-        setDaysToExpire(30);
-    }
-
-    void addHistoryEntry(const HistoryEntry &item)
-        { HistoryManager::addHistoryEntry(item); }
-};
 
 // This will be called before the first test function is executed.
 // It is only called once.
 void tst_QuickView::initTestCase()
-{
-    }
+{   
+    HistoryManager* manager = BrowserApplication::historyManager();
+    m_history = manager->history();
+}
 
 
 // This will be called after the last test function is executed.
 // It is only called once.
 void tst_QuickView::cleanupTestCase()
 {
+    HistoryManager* manager = BrowserApplication::historyManager();
+    manager->setHistory(m_history);
 }
 
 // This will be called before each test function is executed.
 void tst_QuickView::init()
 {
+
 }
 
 // This will be called after every test function.
 void tst_QuickView::cleanup()
 {
-}
-
-// At this point, our history contains six elements
-void tst_QuickView::historyLength()
-{
-	QCOMPARE(m_history.count(),0);
-	for (int i=0; i<10; i++){
-		QString s;
-		std::stringstream out;
-		out << "http://foo.com/" << i;
-		s = QString::fromStdString(out.str());
-		HistoryEntry item = HistoryEntry(s, QDateTime::currentDateTime().addDays(-1 - i));
-		m_history << item;
-	}
-	QCOMPARE(m_history.count(),10);
 }
 
 void tst_QuickView::getMostVisited()
@@ -119,6 +98,112 @@ void tst_QuickView::getMostVisited()
 	QVERIFY(last.size() <= desiredLastPages);
 }
 
+void tst_QuickView::getLastHistoryEntries(){
+    QuickView quickView;
+    int desiredLastPages = -1;
+    QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QVERIFY(last.size() == 0);
+
+    QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
+    int rowCount = model->rowCount();
+
+    desiredLastPages = numeric_limits<int>::max();
+    last = quickView.getLastHistoryEntries(desiredLastPages);
+
+    if (rowCount == 0)
+        QVERIFY(last.size() == 0);
+    else if (rowCount > 0 && rowCount < 7)
+        QVERIFY(last.size() == rowCount);
+    else
+        QVERIFY(last.size() > 0);
+
+}
+
+void tst_QuickView::getHtmlMessage(){
+    QuickView quickView;
+    int desiredLastPages = -1;
+    QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    if (last.size() == 0)
+        QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") == 0);
+    else
+        QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") > 0);
+
+    QVERIFY(quickView.getHtmlMessage(last).isEmpty() == false);
+    QVERIFY(quickView.getHtmlMessage(last).isNull() == false);
+}
+
+void tst_QuickView::render(){
+    QuickView quickView;
+    QVERIFY(quickView.render(0).isEmpty() == false);
+    QVERIFY(quickView.render(5).isEmpty() == false);
+    QVERIFY(quickView.render(15).isEmpty() == false);
+    QVERIFY(quickView.render(-1).isEmpty() == false);
+}
+
+void tst_QuickView::verifyFilterCount(){
+
+    HistoryManager* manager = BrowserApplication::historyManager();
+    QuickViewFilterModel* model = manager->quickViewFilterModel();
+    QuickView quickView;
+
+    QList<HistoryEntry> emtpyHistory;
+
+    manager->history().clear();
+    manager->setHistory(emtpyHistory);
+
+    QVERIFY(manager->history().count() == 0);
+    manager->addHistoryEntry("http://twitter.com/xyz");
+    manager->addHistoryEntry("http://facebook.com/asd");
+    manager->addHistoryEntry("http://twitter.com/abc");
+    QVERIFY(manager->history().count() == 3);
+    // at this point, we espect two results from QuickViewFilterModel
+    // with the domains twitter.com and facebook.com
+    QVERIFY(model->rowCount() == 2);
+    QList<HistoryEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QVERIFY(mostVisited.count() == 2);
+
+    manager->history().clear();
+    manager->setHistory(emtpyHistory);
+}
+
+void tst_QuickView::verifyFilterFrecencies(){
+
+    HistoryManager* manager = BrowserApplication::historyManager();
+    QuickViewFilterModel* model = manager->quickViewFilterModel();
+    QuickView quickView;
+
+    QList<HistoryEntry> emtpyHistory;
+
+    manager->history().clear();
+    manager->setHistory(emtpyHistory);
+
+    QVERIFY(manager->history().count() == 0);
+    manager->addHistoryEntry("http://facebook.com/lol");
+    manager->addHistoryEntry("http://twitter.com/xyz");
+    manager->addHistoryEntry("http://facebook.com/asd");
+    manager->addHistoryEntry("http://twitter.com/abc");
+    manager->addHistoryEntry("http://twitter.com/def");
+    manager->addHistoryEntry("http://twitter.com/def");
+    manager->addHistoryEntry("http://twitter.com/qwe");
+    manager->addHistoryEntry("http://twitter.com/def");
+    manager->addHistoryEntry("http://twitter.com/poi");
+    QVERIFY(manager->history().count() == 9);
+    // at this point, we espect two results from QuickViewFilterModel
+    // with the domains twitter.com and facebook.com
+    QVERIFY(model->rowCount() == 2);
+    QList<HistoryEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QVERIFY(mostVisited.count() == 2);
+
+    //QVERIFY(mostVisited.last().url.contains("facebook"));
+    QHashIterator<QString, int> i(quickView.getFrecencies(6));
+    while (i.hasNext()) {
+        i.next();
+        cout << i.key().toStdString() << ": " << endl;// << i.value();
+    }
+    QFAIL("quickView should return domains only");
+    manager->history().clear();s
+    manager->setHistory(emtpyHistory);
+}
 
 QTEST_MAIN(tst_QuickView)
 #include "tst_quickview.moc"

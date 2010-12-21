@@ -38,6 +38,7 @@ public:
     QString getHtmlMessage(QList<HistoryEntry> history);
     QByteArray getHtmlPage(QString htmlMessage);
     QByteArray render(int numberEntries);
+    QHash<QString, int> getFrecencies(int numberEntries);
 };
 
 #endif // QUICKVIEW_H

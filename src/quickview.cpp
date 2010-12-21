@@ -23,6 +23,7 @@
 #include <historymanager.h>
 #include <QDateTime>
 #include <QFile>
+#include <QHash>
 QList<HistoryEntry> QuickView::getLastHistoryEntries(int numberEntries){
 
     if (numberEntries < 1)
@@ -42,11 +43,6 @@ QList<HistoryEntry> QuickView::getLastHistoryEntries(int numberEntries){
         QString title = index.data(HistoryModel::TitleRole).toString();
         QDateTime datetime = index.data(HistoryModel::DateTimeRole).toDateTime();
         HistoryEntry entry(url, datetime, title);
-        /*
-        HistoryEntry(const QString &u,
-                    const QDateTime &d = QDateTime(), const QString &t = QString())
-                : url(u), title(t), dateTime(d) {}
-        */
         list.append(entry);
     }
     return list;
@@ -69,15 +65,14 @@ QString QuickView::getHtmlMessage(QList<HistoryEntry> mostVisited){
 
 
 QByteArray QuickView::getHtmlPage(QString htmlMessage){
-        QuickView quickView;
+
         QFile quickViewPage(QLatin1String(":/quickview.html"));
         if (!quickViewPage.open(QIODevice::ReadOnly))
             return QByteArray("");
 
         QString html = QLatin1String(quickViewPage.readAll());
 
-        QString quickViewEntries = quickView.getHtmlMessage(quickView.getLastHistoryEntries(6));
-        html = html.arg(quickViewEntries);
+        html = html.arg(htmlMessage);
         return QByteArray(html.toLatin1());
 }
 
@@ -87,3 +82,25 @@ QByteArray QuickView::render(int numberEntries){
     return getHtmlPage(mostVisitedHtmlEntries);
 }
 
+
+QHash<QString, int> QuickView::getFrecencies(int numberEntries){
+
+    if (numberEntries < 1)
+        return QHash<QString, int>();
+
+    QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
+    int rowCount = model->rowCount();
+
+    if (rowCount < numberEntries)
+        numberEntries = rowCount;
+
+   QHash<QString, int> list;
+
+    for (int i = 0; i < numberEntries; i++){
+        QModelIndex index = model->index(i,0,QModelIndex());
+        QString url = index.data(HistoryModel::UrlRole).toString();
+        int frec = index.data(HistoryFilterModel::FrecencyRole).toInt();
+        list.insert(url, frec);
+    }
+    return list;
+}
