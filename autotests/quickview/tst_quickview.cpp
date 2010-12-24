@@ -53,6 +53,7 @@ private slots:
         // END
         // BEGIN: tests against fake history
         void verifyFilterCount();
+        void verifyOperatorFrecencies();
         void verifyFilterFrecencies();
 	
 
@@ -94,14 +95,14 @@ void tst_QuickView::getMostVisited()
 {
 	QuickView quickView;
 	int desiredLastPages = 6;
-	QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+        QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
 	QVERIFY(last.size() <= desiredLastPages);
 }
 
 void tst_QuickView::getLastHistoryEntries(){
     QuickView quickView;
     int desiredLastPages = -1;
-    QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
     QVERIFY(last.size() == 0);
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
@@ -122,7 +123,7 @@ void tst_QuickView::getLastHistoryEntries(){
 void tst_QuickView::getHtmlMessage(){
     QuickView quickView;
     int desiredLastPages = -1;
-    QList<HistoryEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
     if (last.size() == 0)
         QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") == 0);
     else
@@ -158,9 +159,32 @@ void tst_QuickView::verifyFilterCount(){
     QVERIFY(manager->history().count() == 3);
     // at this point, we espect two results from QuickViewFilterModel
     // with the domains twitter.com and facebook.com
-    QVERIFY(model->rowCount() == 2);
-    QList<HistoryEntry> mostVisited = quickView.getLastHistoryEntries(6);
-    QVERIFY(mostVisited.count() == 2);
+    QCOMPARE(model->rowCount(), 2);
+    QList<HistoryFrecencyEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QCOMPARE(mostVisited.count(), 2);
+
+    manager->history().clear();
+    manager->setHistory(emtpyHistory);
+}
+
+void tst_QuickView::verifyOperatorFrecencies(){
+    QList<HistoryEntry> emtpyHistory;
+    HistoryManager* manager = BrowserApplication::historyManager();
+    manager->history().clear();
+    manager->setHistory(emtpyHistory);
+
+    HistoryFrecencyEntry twitter(QString("http://twitter.com"),QDateTime(),QString("Twitter"),100);
+    HistoryFrecencyEntry facebook(QString("http://facebook.com"),QDateTime(),QString("Twitter"),200);
+    HistoryFrecencyEntry google(QString("http://google.com"),QDateTime(),QString("Google"),500);
+    HistoryFrecencyEntry yahoo(QString("http://yahoo.com"),QDateTime(),QString("Yahoo"),200);
+
+    QCOMPARE((twitter < facebook), true);
+    QCOMPARE((twitter > facebook), false);
+    QCOMPARE((twitter == facebook), false);
+
+    QCOMPARE((facebook == yahoo), true);
+    QCOMPARE((facebook > yahoo), false);
+    QCOMPARE((google > facebook), true);
 
     manager->history().clear();
     manager->setHistory(emtpyHistory);
@@ -187,21 +211,20 @@ void tst_QuickView::verifyFilterFrecencies(){
     manager->addHistoryEntry("http://twitter.com/qwe");
     manager->addHistoryEntry("http://twitter.com/def");
     manager->addHistoryEntry("http://twitter.com/poi");
-    QVERIFY(manager->history().count() == 9);
+    manager->addHistoryEntry("http://facebook.com/ooo");
+    QVERIFY(manager->history().count() == 10);
     // at this point, we espect two results from QuickViewFilterModel
-    // with the domains twitter.com and facebook.com
+    // with the domains twitter.com as most visited and facebook.com as second one
     QVERIFY(model->rowCount() == 2);
-    QList<HistoryEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QList<HistoryFrecencyEntry> mostVisited = quickView.getLastHistoryEntries(6);
     QVERIFY(mostVisited.count() == 2);
+    cout << "most visited:" << mostVisited.first().url.toStdString() << ": " << mostVisited.first().frecency << endl;
+    cout << "less visited:" << mostVisited.last().url.toStdString() << ": " << mostVisited.last().frecency << endl;
+    QVERIFY(mostVisited.first().url.compare(QString("http://twitter.com")) == 0);
 
-    //QVERIFY(mostVisited.last().url.contains("facebook"));
-    QHashIterator<QString, int> i(quickView.getFrecencies(6));
-    while (i.hasNext()) {
-        i.next();
-        cout << i.key().toStdString() << ": " << endl;// << i.value();
-    }
-    QFAIL("quickView should return domains only");
-    manager->history().clear();s
+    QVERIFY(mostVisited.last().url.compare(QString("http://facebook.com")) == 0);
+
+    manager->history().clear();
     manager->setHistory(emtpyHistory);
 }
 

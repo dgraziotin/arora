@@ -73,6 +73,7 @@
 #include <qurl.h>
 
 #include <qwebhistoryinterface.h>
+#include <historymanager.h>
 
 class HistoryManager;
 class HistoryModel : public QAbstractTableModel
