@@ -39,25 +39,57 @@ class tst_QuickView : public QObject
     Q_OBJECT
 
 public slots:
+    /**
+     * Called before the beginning of the Unittest.
+     */
     void initTestCase();
+    /**
+     * Called after the end of the Unittest.
+     * It restores the user history
+     */
     void cleanupTestCase();
     void init();
     void cleanup();
 
 private slots:
-        // BEGIN: tests against real history
-	void getMostVisited();
-        void getLastHistoryEntries();
-        void getHtmlMessage();
-        void render();
-        // END
-        // BEGIN: tests against fake history
-        void verifyFilterCount();
-        void verifyOperatorFrecencies();
-        void verifyFilterFrecencies();
-	
+    // BEGIN: tests against real history
+    /**
+     * Verifies that a call to QuickView::getMostVisited(int howMany)
+     * returns 0 <= entries <= howMany hosts, from history
+     */
+    void getMostVisited();
+    /**
+     * Verifies QuickView::getMostVisited(int howMany) using dangerous
+     * values for howMany. It also checks QuickViewFilterModel values
+     */
+    void getLastHistoryEntries();
+    /**
+     * Verifies QuickView::getHtmlMessage() about its return value,
+     * in all possible cases
+     */
+    void getHtmlMessage();
+    /**
+     * Verifies QuickView::render() by using dangerous parameter values
+     */
+    void render();
+    // END
+    // BEGIN: tests against fake history
+    /**
+     * Heavily verifies the functioning of QuickViewFilterModel
+     */
+    void verifyFilterCount();
+    /**
+     * Heavily verifies the operator overloading of QuickView::HistoryFrecencyEntry class
+     */
+    void verifyOperatorFrecencies();
+    /**
+     * Verifies that the frencencies are correctly computed for having the Top N visited
+     * hosts
+     */
+    void verifyFilterFrecencies();
 
-public:
+
+private:
     QList<HistoryEntry> m_history;
 };
 
@@ -66,7 +98,7 @@ public:
 // This will be called before the first test function is executed.
 // It is only called once.
 void tst_QuickView::initTestCase()
-{   
+{
     HistoryManager* manager = BrowserApplication::historyManager();
     m_history = manager->history();
 }
@@ -93,13 +125,14 @@ void tst_QuickView::cleanup()
 
 void tst_QuickView::getMostVisited()
 {
-	QuickView quickView;
-	int desiredLastPages = 6;
-        QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
-	QVERIFY(last.size() <= desiredLastPages);
+    QuickView quickView;
+    int desiredLastPages = 6;
+    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QVERIFY(last.size() <= desiredLastPages);
 }
 
-void tst_QuickView::getLastHistoryEntries(){
+void tst_QuickView::getLastHistoryEntries()
+{
     QuickView quickView;
     int desiredLastPages = -1;
     QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
@@ -111,20 +144,21 @@ void tst_QuickView::getLastHistoryEntries(){
     desiredLastPages = numeric_limits<int>::max();
     last = quickView.getLastHistoryEntries(desiredLastPages);
 
-    if (rowCount == 0)
+    if(rowCount == 0)
         QVERIFY(last.size() == 0);
-    else if (rowCount > 0 && rowCount < 7)
+    else if(rowCount > 0 && rowCount < 7)
         QVERIFY(last.size() == rowCount);
     else
         QVERIFY(last.size() > 0);
 
 }
 
-void tst_QuickView::getHtmlMessage(){
+void tst_QuickView::getHtmlMessage()
+{
     QuickView quickView;
     int desiredLastPages = -1;
     QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
-    if (last.size() == 0)
+    if(last.size() == 0)
         QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") == 0);
     else
         QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") > 0);
@@ -133,7 +167,8 @@ void tst_QuickView::getHtmlMessage(){
     QVERIFY(quickView.getHtmlMessage(last).isNull() == false);
 }
 
-void tst_QuickView::render(){
+void tst_QuickView::render()
+{
     QuickView quickView;
     QVERIFY(quickView.render(0).isEmpty() == false);
     QVERIFY(quickView.render(5).isEmpty() == false);
@@ -141,7 +176,8 @@ void tst_QuickView::render(){
     QVERIFY(quickView.render(-1).isEmpty() == false);
 }
 
-void tst_QuickView::verifyFilterCount(){
+void tst_QuickView::verifyFilterCount()
+{
 
     HistoryManager* manager = BrowserApplication::historyManager();
     QuickViewFilterModel* model = manager->quickViewFilterModel();
@@ -167,16 +203,17 @@ void tst_QuickView::verifyFilterCount(){
     manager->setHistory(emtpyHistory);
 }
 
-void tst_QuickView::verifyOperatorFrecencies(){
+void tst_QuickView::verifyOperatorFrecencies()
+{
     QList<HistoryEntry> emtpyHistory;
     HistoryManager* manager = BrowserApplication::historyManager();
     manager->history().clear();
     manager->setHistory(emtpyHistory);
 
-    HistoryFrecencyEntry twitter(QString("http://twitter.com"),QDateTime(),QString("Twitter"),100);
-    HistoryFrecencyEntry facebook(QString("http://facebook.com"),QDateTime(),QString("Twitter"),200);
-    HistoryFrecencyEntry google(QString("http://google.com"),QDateTime(),QString("Google"),500);
-    HistoryFrecencyEntry yahoo(QString("http://yahoo.com"),QDateTime(),QString("Yahoo"),200);
+    HistoryFrecencyEntry twitter(QString("http://twitter.com"), QDateTime(), QString("Twitter"), 100);
+    HistoryFrecencyEntry facebook(QString("http://facebook.com"), QDateTime(), QString("Twitter"), 200);
+    HistoryFrecencyEntry google(QString("http://google.com"), QDateTime(), QString("Google"), 500);
+    HistoryFrecencyEntry yahoo(QString("http://yahoo.com"), QDateTime(), QString("Yahoo"), 200);
 
     QCOMPARE((twitter < facebook), true);
     QCOMPARE((twitter > facebook), false);
@@ -190,7 +227,8 @@ void tst_QuickView::verifyOperatorFrecencies(){
     manager->setHistory(emtpyHistory);
 }
 
-void tst_QuickView::verifyFilterFrecencies(){
+void tst_QuickView::verifyFilterFrecencies()
+{
 
     HistoryManager* manager = BrowserApplication::historyManager();
     QuickViewFilterModel* model = manager->quickViewFilterModel();

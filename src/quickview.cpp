@@ -26,30 +26,31 @@
 #include <QHash>
 #include <qalgorithms.h>
 
-bool compareHistoryFrecencyEntries (const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
+bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
 {
-  // for a reverse quickSort.
-  return a > b;
+    // for a reverse quickSort.
+    return a > b;
 }
 
 HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f):
-        HistoryEntry(u, d, t), frecency(f){}
+    HistoryEntry(u, d, t), frecency(f) {}
 
-QList<HistoryFrecencyEntry> QuickView::getLastHistoryEntries(int numberEntries){
+QList<HistoryFrecencyEntry> QuickView::getLastHistoryEntries(int numberEntries)
+{
 
-    if (numberEntries < 1)
+    if(numberEntries < 1)
         return QList<HistoryFrecencyEntry>();
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
     int rowCount = model->rowCount();
 
-    if (rowCount < numberEntries)
+    if(rowCount < numberEntries)
         numberEntries = rowCount;
 
     QList<HistoryFrecencyEntry> list;
 
-    for (int i = 0; i < numberEntries; i++){
-        QModelIndex index = model->index(i,0,QModelIndex());
+    for(int i = 0; i < numberEntries; i++) {
+        QModelIndex index = model->index(i, 0, QModelIndex());
         QUrl url(index.data(HistoryModel::UrlRole).toString());
         QDateTime datetime = index.data(HistoryModel::DateTimeRole).toDateTime();
         QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();
@@ -58,16 +59,17 @@ QList<HistoryFrecencyEntry> QuickView::getLastHistoryEntries(int numberEntries){
         HistoryFrecencyEntry entry(finalUrl, datetime, finalTitle, frecency);
         list.append(entry);
     }
-    qSort (list.begin(), list.end(), compareHistoryFrecencyEntries);
+    qSort(list.begin(), list.end(), compareHistoryFrecencyEntries);
     return list;
 }
 
-QString QuickView::getHtmlMessage(QList<HistoryFrecencyEntry> mostVisited){
+QString QuickView::getHtmlMessage(QList<HistoryFrecencyEntry> mostVisited)
+{
     if(mostVisited.isEmpty())
         return QLatin1String("<p>No recent websites</p>");
     QString htmlMessage;
     QString linkFormat = QLatin1String("<p><a href=\"%1\">%2</a></p>");
-    for(int i = 0; i < mostVisited.size(); i++){
+    for(int i = 0; i < mostVisited.size(); i++) {
         QUrl entryUrl(mostVisited.at(i).url);
         QString finalUrl = entryUrl.scheme() + QString::fromLatin1("://") + entryUrl.host();
         QString finalTitle = entryUrl.host();
@@ -78,40 +80,43 @@ QString QuickView::getHtmlMessage(QList<HistoryFrecencyEntry> mostVisited){
 }
 
 
-QByteArray QuickView::getHtmlPage(QString htmlMessage){
+QByteArray QuickView::getHtmlPage(QString htmlMessage)
+{
 
-        QFile quickViewPage(QLatin1String(":/quickview.html"));
-        if (!quickViewPage.open(QIODevice::ReadOnly))
-            return QByteArray("");
+    QFile quickViewPage(QLatin1String(":/quickview.html"));
+    if(!quickViewPage.open(QIODevice::ReadOnly))
+        return QByteArray("");
 
-        QString html = QLatin1String(quickViewPage.readAll());
+    QString html = QLatin1String(quickViewPage.readAll());
 
-        html = html.arg(htmlMessage);
-        return QByteArray(html.toLatin1());
+    html = html.arg(htmlMessage);
+    return QByteArray(html.toLatin1());
 }
 
-QByteArray QuickView::render(int numberEntries){
+QByteArray QuickView::render(int numberEntries)
+{
     QList<HistoryFrecencyEntry> mostVisited = getLastHistoryEntries(numberEntries);
     QString mostVisitedHtmlEntries = getHtmlMessage(mostVisited);
     return getHtmlPage(mostVisitedHtmlEntries);
 }
 
 
-QHash<QString, int> QuickView::getFrecencies(int numberEntries){
+QHash<QString, int> QuickView::getFrecencies(int numberEntries)
+{
 
-    if (numberEntries < 1)
+    if(numberEntries < 1)
         return QHash<QString, int>();
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
     int rowCount = model->rowCount();
 
-    if (rowCount < numberEntries)
+    if(rowCount < numberEntries)
         numberEntries = rowCount;
 
-   QHash<QString, int> list;
+    QHash<QString, int> list;
 
-    for (int i = 0; i < numberEntries; i++){
-        QModelIndex index = model->index(i,0,QModelIndex());
+    for(int i = 0; i < numberEntries; i++) {
+        QModelIndex index = model->index(i, 0, QModelIndex());
 
         QUrl url(index.data(HistoryModel::UrlRole).toString());
         QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();

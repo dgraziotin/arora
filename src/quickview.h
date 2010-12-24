@@ -31,26 +31,28 @@
 #include <historymanager.h>
 #include <qwebhistoryinterface.h>
 
-class HistoryFrecencyEntry: public HistoryEntry{
+class HistoryFrecencyEntry: public HistoryEntry
+{
 public:
     int frecency;
     HistoryFrecencyEntry();
     HistoryFrecencyEntry(const QString &u, const QDateTime &d = QDateTime(), const QString &t = QString(), const int f = -1);
     // history is sorted in reverse
-    inline bool operator <(const HistoryFrecencyEntry &other) const{
-            return frecency < other.frecency;
+    inline bool operator <(const HistoryFrecencyEntry &other) const {
+        return frecency < other.frecency;
     }
 
-    inline bool operator >(const HistoryFrecencyEntry &other) const{
-            return frecency > other.frecency;
+    inline bool operator >(const HistoryFrecencyEntry &other) const {
+        return frecency > other.frecency;
     }
 
-    inline bool operator ==(const HistoryFrecencyEntry &other) const{
-            return frecency == other.frecency;
+    inline bool operator ==(const HistoryFrecencyEntry &other) const {
+        return frecency == other.frecency;
     }
 };
 
-class QuickView {
+class QuickView
+{
 
 public:
     QList<HistoryFrecencyEntry> getLastHistoryEntries(int numberEntries);
