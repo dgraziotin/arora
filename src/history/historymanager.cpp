@@ -77,6 +77,8 @@
 
 #include <qdebug.h>
 
+#include <quickview/quickviewfiltermodel.h>
+
 QString HistoryEntry::userTitle() const
 {
     // when there is no title try to generate one from the url

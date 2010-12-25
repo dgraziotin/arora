@@ -47,7 +47,6 @@ HEADERS += \
     modelmenu.h \
     modeltoolbar.h \
     plaintexteditsearch.h \
-    quickview.h \
     searchbar.h \
     searchbutton.h \
     searchlineedit.h \
@@ -76,7 +75,6 @@ SOURCES += \
     modelmenu.cpp \
     modeltoolbar.cpp \
     plaintexteditsearch.cpp \
-    quickview.cpp \
     searchbar.cpp \
     searchbutton.cpp \
     searchlineedit.cpp \
@@ -97,6 +95,7 @@ include(history/history.pri)
 include(locationbar/locationbar.pri)
 include(network/network.pri)
 include(opensearch/opensearch.pri)
+include(quickview/quickview.pri)
 include(qwebplugins/qwebplugins.pri)
 include(utils/utils.pri)
 include(useragent/useragent.pri)

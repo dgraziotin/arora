@@ -23,6 +23,8 @@
 #include <historymanager.h>
 #include <history.h>
 #include <historycompleter.h>
+#include <quickview/quickview.h>
+#include <quickview/quickviewfiltermodel.h>
 #include <modeltest.h>
 #include <quickview.h>
 #include <sstream>

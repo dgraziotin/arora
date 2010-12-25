@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QHash>
 #include <qalgorithms.h>
+#include <quickviewfiltermodel.h>
 
 bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
 {

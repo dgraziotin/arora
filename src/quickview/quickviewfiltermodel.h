@@ -60,8 +60,8 @@
 **
 ****************************************************************************/
 
-#ifndef HISTORY_H
-#define HISTORY_H
+#ifndef QUICKVIEWFITERMODEL_H
+#define QUICKVIEWFITERMODEL_H
 
 #include "modelmenu.h"
 
@@ -73,50 +73,20 @@
 #include <qurl.h>
 
 #include <qwebhistoryinterface.h>
-#include <historymanager.h>
-
-class HistoryManager;
-class HistoryModel : public QAbstractTableModel
-{
-    Q_OBJECT
-
-public slots:
-    void historyReset();
-    void entryAdded();
-    void entryUpdated(int offset);
-
-public:
-    enum Roles {
-        DateRole = Qt::UserRole + 1,
-        DateTimeRole = Qt::UserRole + 2,
-        UrlRole = Qt::UserRole + 3,
-        UrlStringRole = Qt::UserRole + 4,
-        TitleRole = Qt::UserRole + 5,
-        MaxRole = TitleRole
-    };
-
-    HistoryModel(HistoryManager *history, QObject *parent = 0);
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-private:
-    HistoryManager *m_history;
-};
+#include <history/historymanager.h>
+#include <history/history.h>
 
 /*!
     Proxy model that will remove any duplicate entries.
     Both m_sourceRow and m_historyHash store their offsets not from
     the front of the list, but as offsets from the back.
   */
-class HistoryFilterModel : public QAbstractProxyModel
+class QuickViewFilterModel : public QAbstractProxyModel
 {
     Q_OBJECT
 
 public:
-    HistoryFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
+    QuickViewFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
 
     inline bool historyContains(const QString &url) const {
         return m_historyHash.contains(url);
@@ -138,7 +108,7 @@ public:
     QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
+    bool isValid(const QUrl url) const;
     void recalculateFrecencies();
 
 private slots:
@@ -176,115 +146,6 @@ private:
     mutable QDateTime m_scaleTime;
 };
 
-/*
-    The history menu
-    - Removes the first twenty entries and puts them as children of the top level.
-    - If there are less then twenty entries then the first folder is also removed.
 
-    The mapping is done by knowing that HistoryTreeModel is over a table
-    We store that row offset in our index's private data.
-*/
-class HistoryTreeModel;
-class HistoryMenuModel : public QAbstractProxyModel
-{
-    Q_OBJECT
-
-public:
-    HistoryMenuModel(HistoryTreeModel *sourceModel, QObject *parent = 0);
-    int columnCount(const QModelIndex &parent) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex mapFromSource(const QModelIndex & sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex & proxyIndex) const;
-    QModelIndex index(int, int, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
-    QMimeData *mimeData(const QModelIndexList &indexes) const;
-
-    int bumpedRows() const;
-
-private:
-    HistoryTreeModel *m_treeModel;
-};
-
-// Menu that is dynamically populated from the history
-class HistoryMenu : public ModelMenu
-{
-    Q_OBJECT
-
-signals:
-    void openUrl(const QUrl &url, const QString &title);
-
-public:
-    HistoryMenu(QWidget *parent = 0);
-    void setInitialActions(QList<QAction*> actions);
-
-protected:
-    bool prePopulated();
-    void postPopulated();
-
-private slots:
-    void activated(const QModelIndex &index);
-    void showHistoryDialog();
-    void clearHistoryDialog();
-
-private:
-    HistoryManager *m_history;
-    HistoryMenuModel *m_historyMenuModel;
-    QList<QAction*> m_initialActions;
-};
-
-// proxy model for the history model that converts the list
-// into a tree, one top level node per day.
-// Used in the HistoryDialog.
-class HistoryTreeModel : public QAbstractProxyModel
-{
-    Q_OBJECT
-
-public:
-    HistoryTreeModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    int columnCount(const QModelIndex &parent) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
-    bool hasChildren(const QModelIndex &parent = QModelIndex()) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-    void setSourceModel(QAbstractItemModel *sourceModel);
-
-private slots:
-    void sourceReset();
-    void sourceRowsInserted(const QModelIndex &parent, int start, int end);
-    void sourceRowsRemoved(const QModelIndex &parent, int start, int end);
-
-private:
-    int sourceDateRow(int row) const;
-    mutable QList<int> m_sourceRowCache;
-    bool removingDown;
-
-};
-
-#include "ui_history.h"
-
-class HistoryDialog : public QDialog, public Ui_HistoryDialog
-{
-    Q_OBJECT
-
-signals:
-    void openUrl(const QUrl &url, const QString &title);
-
-public:
-    HistoryDialog(QWidget *parent = 0, HistoryManager *history = 0);
-
-private slots:
-    void customContextMenuRequested(const QPoint &pos);
-    void open();
-    void copy();
-
-};
-
-#endif // HISTORY_H
+#endif // QUICKVIEWFITERMODEL_H
 
