@@ -145,7 +145,6 @@ void LocationBar::keyPressEvent(QKeyEvent *event)
     }
 
     QString currentText = text().trimmed();
-    //TODO: here is when user presses enter in location bar
     if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         && !currentText.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) {
         QString append;
