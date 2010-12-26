@@ -151,8 +151,10 @@ void LocationBar::keyPressEvent(QKeyEvent *event)
 
         QString dot = QString::fromLatin1(".");
         QString space = QString::fromLatin1(" ");
-        if (currentText.indexOf(dot) == -1
-            || currentText.indexOf(space) != -1){
+        if ((currentText.indexOf(dot) == -1
+            || currentText.indexOf(space) != -1)
+            && !currentText.startsWith(QLatin1String("about:"), Qt::CaseInsensitive)
+            && !currentText.startsWith(QLatin1String("qrc:"), Qt::CaseInsensitive)){
             ToolbarSearch* search = BrowserApplication::instance()->mainWindow()->toolbarSearch();
             search->setText(currentText);
             search->searchNow();
