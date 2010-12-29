@@ -68,6 +68,7 @@
 #include <qtimer.h>
 #include <qurl.h>
 #include <qwebhistoryinterface.h>
+#include "quickview/quickviewfiltermodel.h"
 
 class HistoryEntry
 {
@@ -96,8 +97,8 @@ public:
 class AutoSaver;
 class HistoryModel;
 class HistoryFilterModel;
-class HistoryTreeModel;
 class QuickViewFilterModel;
+class HistoryTreeModel;
 class HistoryManager : public QWebHistoryInterface
 {
     Q_OBJECT
@@ -128,8 +129,8 @@ public:
     // History manager keeps around these models for use by the completer and other classes
     HistoryModel *historyModel() const;
     HistoryFilterModel *historyFilterModel() const;
-    HistoryTreeModel *historyTreeModel() const;
     QuickViewFilterModel *quickViewFilterModel() const;
+    HistoryTreeModel *historyTreeModel() const;
 
 public slots:
     void clear();
@@ -159,8 +160,8 @@ private:
 
     HistoryModel *m_historyModel;
     HistoryFilterModel *m_historyFilterModel;
-    HistoryTreeModel *m_historyTreeModel;
     QuickViewFilterModel *m_quickViewFilterModel;
+    HistoryTreeModel *m_historyTreeModel;
 };
 
 #endif // HISTORYMANAGER_H

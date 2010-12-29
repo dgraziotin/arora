@@ -77,8 +77,6 @@
 
 #include <qdebug.h>
 
-#include <quickview/quickviewfiltermodel.h>
-
 QString HistoryEntry::userTitle() const
 {
     // when there is no title try to generate one from the url
@@ -100,7 +98,6 @@ HistoryManager::HistoryManager(QObject *parent)
     , m_historyModel(0)
     , m_historyFilterModel(0)
     , m_historyTreeModel(0)
-    , m_quickViewFilterModel(0)
 {
     m_expiredTimer.setSingleShot(true);
     connect(&m_expiredTimer, SIGNAL(timeout()),
@@ -180,16 +177,15 @@ HistoryFilterModel *HistoryManager::historyFilterModel() const
     return m_historyFilterModel;
 }
 
-HistoryTreeModel *HistoryManager::historyTreeModel() const
-{
-    return m_historyTreeModel;
-}
-
 QuickViewFilterModel *HistoryManager::quickViewFilterModel() const
 {
     return m_quickViewFilterModel;
 }
 
+HistoryTreeModel *HistoryManager::historyTreeModel() const
+{
+    return m_historyTreeModel;
+}
 
 void HistoryManager::checkForExpired()
 {
