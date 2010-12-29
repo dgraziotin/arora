@@ -57,11 +57,11 @@ public:
     QUndoStack *undoRedoStack() {
         return &m_commands;
     }
-
+/*
 public slots:
     void importBookmarks();
     void exportBookmarks();
-
+*/
 private slots:
     void save() const;
 

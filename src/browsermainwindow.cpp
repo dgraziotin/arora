@@ -494,7 +494,7 @@ void BrowserMainWindow::setupMenu()
             this, SLOT(fileSaveAs()));
     m_fileMenu->addAction(m_fileSaveAsAction);
     m_fileMenu->addSeparator();
-
+    /*
     BookmarksManager *bookmarksManager = BrowserApplication::bookmarksManager();
     m_fileImportBookmarksAction = new QAction(m_fileMenu);
     connect(m_fileImportBookmarksAction, SIGNAL(triggered()),
@@ -505,6 +505,7 @@ void BrowserMainWindow::setupMenu()
             bookmarksManager, SLOT(exportBookmarks()));
     m_fileMenu->addAction(m_fileExportBookmarksAction);
     m_fileMenu->addSeparator();
+    */
 
     m_filePrintPreviewAction= new QAction(m_fileMenu);
     connect(m_filePrintPreviewAction, SIGNAL(triggered()),
@@ -941,8 +942,10 @@ void BrowserMainWindow::retranslate()
     m_fileOpenFileAction->setText(tr("&Open File..."));
     m_fileOpenLocationAction->setText(tr("Open &Location..."));
     m_fileSaveAsAction->setText(tr("&Save As..."));
+    /*
     m_fileImportBookmarksAction->setText(tr("&Import Bookmarks..."));
     m_fileExportBookmarksAction->setText(tr("&Export Bookmarks..."));
+    */
     m_filePrintPreviewAction->setText(tr("P&rint Preview..."));
     m_filePrintAction->setText(tr("&Print..."));
     m_filePrivateBrowsingAction->setText(tr("Private &Browsing..."));

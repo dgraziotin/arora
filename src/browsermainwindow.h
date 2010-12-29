@@ -181,8 +181,10 @@ private:
     QAction *m_fileOpenFileAction;
     QAction *m_fileOpenLocationAction;
     QAction *m_fileSaveAsAction;
+    /*
     QAction *m_fileImportBookmarksAction;
     QAction *m_fileExportBookmarksAction;
+    */
     QAction *m_filePrintPreviewAction;
     QAction *m_filePrintAction;
     QAction *m_filePrivateBrowsingAction;
