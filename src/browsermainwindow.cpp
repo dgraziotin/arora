@@ -1418,7 +1418,7 @@ void BrowserMainWindow::goHome()
 void BrowserMainWindow::goQuickView()
 {
     QuickView quickView;
-    tabWidget()->currentWebView()->setContent(quickView.render(6));
+    tabWidget()->currentWebView()->setContent(quickView.render(QuickView::s_numberEntries));
 }
 
 void BrowserMainWindow::webSearch()

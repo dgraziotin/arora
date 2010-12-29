@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Benjamin C. Meyer <ben@meyerhome.net>
+ * Copyright 2010 Daniel Graziotin <daniel.graziotin@acm.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,49 +17,6 @@
  * Boston, MA  02110-1301  USA
  */
 
-/****************************************************************************
-**
-** Copyright (C) 2007-2008 Trolltech ASA. All rights reserved.
-**
-** This file is part of the demonstration applications of the Qt Toolkit.
-**
-** This file may be used under the terms of the GNU General Public
-** License versions 2.0 or 3.0 as published by the Free Software
-** Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file.  Alternatively you may (at
-** your option) use any later version of the GNU General Public
-** License if such license has been publicly approved by Trolltech ASA
-** (or its successors, if any) and the KDE Free Qt Foundation. In
-** addition, as a special exception, Trolltech gives you certain
-** additional rights. These rights are described in the Trolltech GPL
-** Exception version 1.2, which can be found at
-** http://www.trolltech.com/products/qt/gplexception/ and in the file
-** GPL_EXCEPTION.txt in this package.
-**
-** Please review the following information to ensure GNU General
-** Public Licensing requirements will be met:
-** http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-** you are unsure which license is appropriate for your use, please
-** review the following information:
-** http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-** or contact the sales department at sales@trolltech.com.
-**
-** In addition, as a special exception, Trolltech, as the sole
-** copyright holder for Qt Designer, grants users of the Qt/Eclipse
-** Integration plug-in the right for the Qt/Eclipse Integration to
-** link to functionality provided by Qt Designer and its related
-** libraries.
-**
-** This file is provided "AS IS" with NO WARRANTY OF ANY KIND,
-** INCLUDING THE WARRANTIES OF DESIGN, MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE. Trolltech reserves all rights not expressly
-** granted herein.
-**
-** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-**
-****************************************************************************/
-
 #ifndef QUICKVIEWFITERMODEL_H
 #define QUICKVIEWFITERMODEL_H
 
@@ -76,50 +33,115 @@
 #include <history/historymanager.h>
 #include <history/history.h>
 
-/*!
-    Proxy model that will remove any duplicate entries.
-    Both m_sourceRow and m_historyHash store their offsets not from
-    the front of the list, but as offsets from the back.
-  */
+/**
+ *   Proxy model that removes any duplicate entries and saves the host of
+ *   every URL passed. It stores in m_historyHash the hosts visited by the user
+ *   of Arora and computes their frecencies.
+ *   It is a modified version of HistoryFilterModel, but not its subclass yet.
+ *   It may be in future.
+ */
 class QuickViewFilterModel : public QAbstractProxyModel
 {
     Q_OBJECT
 
 public:
+    /**
+     * Constructor for settings the source model of the Proxy
+     * @param sourceModel the data set on which the proxy operates. This is an
+     *                    HistoryModel instance in Arora
+     * @param parent QT typical parent parameter
+     */
     QuickViewFilterModel(QAbstractItemModel *sourceModel, QObject *parent = 0);
 
+    /**
+     * Checks for the presence of a entry in the Hash table
+     * @param url the URL to be checked. It is automatically converted to the form
+     *         http://xxx.yyy.zz/
+     * @return true if the host is contained in the hash table
+     */
     inline bool historyContains(const QString &url) const {
         return m_historyHash.contains(url);
     }
+
     int historyLocation(const QString &url) const;
 
+    /**
+     * Roles for returning QVariant data
+     */
     enum Roles {
         FrecencyRole = HistoryModel::MaxRole + 1,
         MaxRole = FrecencyRole
     };
 
+    /**
+     * Returns the model index in the proxy model that corresponds to the sourceIndex from the source model.
+     */
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
+    /**
+     * Returns the model index in the source model that corresponds to the proxyIndex in the proxy model.
+     */
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+    /**
+     * Sets the sourceModel. In Arora, this is a HistoryModel instance
+     */
     void setSourceModel(QAbstractItemModel *sourceModel);
+    /**
+     * @return the data for the given role and section in the header with the specified orientation.
+     */
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    /**
+     * @return the number of rows of the internal Hash Table
+     */
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    /**
+     * @return always 0 or 2 if there are problems
+     */
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    /**
+     * @return The index of the item in the model specified by the given row, column and parent index.
+     */
     QModelIndex index(int, int, const QModelIndex &parent = QModelIndex()) const;
+    /**
+     * @return the parent index of the given one
+     */
     QModelIndex parent(const QModelIndex &index = QModelIndex()) const;
+    /**
+     * Removes count rows starting with the given row under parent parent from the model
+     */
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    /**
+     * @return the data stored under the given role for the item referred to by the index.
+     */
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    /**
+     * Helper method to check the validity of a url
+     * @return true if the url is valid for our model
+     */
     bool isValid(const QUrl url) const;
+    /**
+     * Forces to check the frecencies of the entries
+     */
     void recalculateFrecencies();
 
 private slots:
+    /**
+     * Signals
+     */
     void sourceReset();
     void sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void sourceRowsInserted(const QModelIndex &parent, int start, int end);
     void sourceRowsRemoved(const QModelIndex &, int, int);
 
 private:
+    /**
+     * Crucial method: it maps the history, converts every entry to their
+     * hosts and populates the internal data structures
+     */
     void load() const;
 
+    /**
+     * Helper data structure to hold the entries with their frecency
+     */
     struct HistoryData {
         int tailOffset;
         int frecency;
@@ -138,11 +160,27 @@ private:
             return (tailOffset > other.tailOffset);
         }
     };
+    /**
+     * Computes the frecency of the entry pointed by sourceIndex
+     * @return the frecency score
+     */
     int frecencyScore(const QModelIndex &sourceIndex) const;
-
+    /**
+     * List of entries of history with their frecency value and pointer
+     */
     mutable QList<HistoryData> m_filteredRows;
+    /**
+     * Hash table holding the entry host and its frecency value
+     */
     mutable QHash<QString, int> m_historyHash;
+    /**
+     * Holds whether the history has been loaded or not
+     */
     mutable bool m_loaded;
+    /**
+     * Holds the current date time to be used as reference for calculating
+     * the frecencies
+     */
     mutable QDateTime m_scaleTime;
 };
 

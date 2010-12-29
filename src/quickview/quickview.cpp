@@ -26,6 +26,8 @@
 #include <QHash>
 #include <qalgorithms.h>
 #include <quickviewfiltermodel.h>
+#include <QBuffer>
+#include <QByteArray>
 
 bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
 {
@@ -33,10 +35,10 @@ bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryF
     return a > b;
 }
 
-HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f):
-    HistoryEntry(u, d, t), frecency(f) {}
+HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f, const QIcon &i):
+    HistoryEntry(u, d, t), frecency(f), icon(i)  {}
 
-QList<HistoryFrecencyEntry> QuickView::getLastHistoryEntries(int numberEntries)
+QList<HistoryFrecencyEntry> QuickView::mostVisitedEntries(int numberEntries)
 {
 
     if(numberEntries < 1)
@@ -57,48 +59,53 @@ QList<HistoryFrecencyEntry> QuickView::getLastHistoryEntries(int numberEntries)
         QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();
         QString finalTitle = url.host();
         int frecency =  index.data(HistoryFilterModel::FrecencyRole).toInt();
-        HistoryFrecencyEntry entry(finalUrl, datetime, finalTitle, frecency);
+        QIcon icon = BrowserApplication::instance()->icon(url);
+        HistoryFrecencyEntry entry(finalUrl, datetime, finalTitle, frecency, icon);
         list.append(entry);
     }
     qSort(list.begin(), list.end(), compareHistoryFrecencyEntries);
     return list;
 }
 
-QString QuickView::getHtmlMessage(QList<HistoryFrecencyEntry> mostVisited)
+QString QuickView::mostVisitedEntriesHTML(QList<HistoryFrecencyEntry> mostVisitedEntries)
 {
-    if(mostVisited.isEmpty())
+    if(mostVisitedEntries.isEmpty())
         return QLatin1String("<p>No recent websites</p>");
     QString htmlMessage;
-    QString linkFormat = QLatin1String("<p><a href=\"%1\">%2</a></p>");
-    for(int i = 0; i < mostVisited.size(); i++) {
-        QUrl entryUrl(mostVisited.at(i).url);
+    QString linkFormat = QLatin1String("<p><a href=\"%1\"><img src=\"data:image/png;base64,%3\"/>%2</a></p>");
+    for(int i = 0; i < mostVisitedEntries.size(); i++) {
+        QUrl entryUrl(mostVisitedEntries.at(i).url);
         QString finalUrl = entryUrl.scheme() + QString::fromLatin1("://") + entryUrl.host();
         QString finalTitle = entryUrl.host();
-        QString entry = linkFormat.arg(finalUrl, finalTitle);
+        QIcon icon = mostVisitedEntries.at(i).icon;
+        QImage image(icon.pixmap(20,20).toImage());
+        QByteArray byteArray;
+        QBuffer buffer(&byteArray);
+        image.save(&buffer, "PNG"); // writes image into ba in PNG format.
+        QString entry = linkFormat.arg(finalUrl, finalTitle, QString::fromLatin1(byteArray.toBase64().data()));
         htmlMessage += entry;
     }
     return htmlMessage;
 }
 
 
-QByteArray QuickView::getHtmlPage(QString htmlMessage)
+QByteArray QuickView::quickViewPage(QString mostVisitedEntriesHTML)
 {
-
     QFile quickViewPage(QLatin1String(":/quickview.html"));
     if(!quickViewPage.open(QIODevice::ReadOnly))
         return QByteArray("");
 
     QString html = QLatin1String(quickViewPage.readAll());
 
-    html = html.arg(htmlMessage);
+    html = html.arg(mostVisitedEntriesHTML);
     return QByteArray(html.toLatin1());
 }
 
 QByteArray QuickView::render(int numberEntries)
 {
-    QList<HistoryFrecencyEntry> mostVisited = getLastHistoryEntries(numberEntries);
-    QString mostVisitedHtmlEntries = getHtmlMessage(mostVisited);
-    return getHtmlPage(mostVisitedHtmlEntries);
+    QList<HistoryFrecencyEntry> mostVisited = mostVisitedEntries(numberEntries);
+    QString mostVisitedHtmlEntries = mostVisitedEntriesHTML(mostVisited);
+    return quickViewPage(mostVisitedHtmlEntries);
 }
 
 

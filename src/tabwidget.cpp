@@ -74,6 +74,7 @@
 #include "locationbar.h"
 #include "opensearchengine.h"
 #include "opensearchmanager.h"
+#include "quickview.h"
 #include "tabbar.h"
 #include "toolbarsearch.h"
 #include "webactionmapper.h"
@@ -828,8 +829,16 @@ QUrl TabWidget::guessUrlFromString(const QString &string)
 #endif
 
     if (url.scheme() == QLatin1String("about")
-        && url.path() == QLatin1String("home"))
-        url = QUrl(QLatin1String("qrc:/startpage.html"));
+        && url.path() == QLatin1String("home")){
+        QSettings settings;
+        settings.beginGroup(QLatin1String("MainWindow"));
+        int startup = settings.value(QLatin1String("startupBehavior")).toInt();
+
+        if (startup == 0)
+            url = QUrl(QLatin1String("qrc:/startpage.html"));
+        if (startup == 3)
+            url = QUrl(QLatin1String("about:quickview"));
+    }
 
     // QUrl::isValid() is too much tolerant.
     // We actually want to check if the url conforms to the RFC, which QUrl::isValid() doesn't state.
@@ -936,13 +945,20 @@ void TabWidget::loadUrl(const QUrl &url, OpenUrlIn tab, const QString &title)
         loadUrlFromUser(url, title);
         return;
     }
-    if (!url.isValid())
+    if (!url.toString().compare(QString::fromLatin1("about:quickview")) == 0
+        || !url.isValid())
         return;
     WebView *webView = getView(tab, currentWebView());
     if (webView) {
         int index = webViewIndex(webView);
         if (index != -1)
             locationBar(index)->setText(QString::fromUtf8(url.toEncoded()));
+        if(url.toString().compare(QString::fromLatin1("about:quickview")) == 0){
+            QuickView quickView;
+            webView->setContent(quickView.render(QuickView::s_numberEntries));
+            emit setCurrentTitle(url.toString());
+            return;
+        }
         webView->loadUrl(url, title);
     }
 }

@@ -64,12 +64,12 @@ private slots:
      * Verifies QuickView::getMostVisited(int howMany) using dangerous
      * values for howMany. It also checks QuickViewFilterModel values
      */
-    void getLastHistoryEntries();
+    void mostVisitedEntries();
     /**
-     * Verifies QuickView::getHtmlMessage() about its return value,
+     * Verifies QuickView::mostVisitedEntriesHTML() about its return value,
      * in all possible cases
      */
-    void getHtmlMessage();
+    void mostVisitedEntriesHTML();
     /**
      * Verifies QuickView::render() by using dangerous parameter values
      */
@@ -129,22 +129,22 @@ void tst_QuickView::getMostVisited()
 {
     QuickView quickView;
     int desiredLastPages = 6;
-    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QList<HistoryFrecencyEntry> last = quickView.mostVisitedEntries(desiredLastPages);
     QVERIFY(last.size() <= desiredLastPages);
 }
 
-void tst_QuickView::getLastHistoryEntries()
+void tst_QuickView::mostVisitedEntries()
 {
     QuickView quickView;
     int desiredLastPages = -1;
-    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QList<HistoryFrecencyEntry> last = quickView.mostVisitedEntries(desiredLastPages);
     QVERIFY(last.size() == 0);
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
     int rowCount = model->rowCount();
 
     desiredLastPages = numeric_limits<int>::max();
-    last = quickView.getLastHistoryEntries(desiredLastPages);
+    last = quickView.mostVisitedEntries(desiredLastPages);
 
     if(rowCount == 0)
         QVERIFY(last.size() == 0);
@@ -155,18 +155,18 @@ void tst_QuickView::getLastHistoryEntries()
 
 }
 
-void tst_QuickView::getHtmlMessage()
+void tst_QuickView::mostVisitedEntriesHTML()
 {
     QuickView quickView;
     int desiredLastPages = -1;
-    QList<HistoryFrecencyEntry> last = quickView.getLastHistoryEntries(desiredLastPages);
+    QList<HistoryFrecencyEntry> last = quickView.mostVisitedEntries(desiredLastPages);
     if(last.size() == 0)
-        QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") == 0);
+        QVERIFY(quickView.mostVisitedEntriesHTML(last).compare("<p>No recent websites</p>") == 0);
     else
-        QVERIFY(quickView.getHtmlMessage(last).compare("<p>No recent websites</p>") > 0);
+        QVERIFY(quickView.mostVisitedEntriesHTML(last).compare("<p>No recent websites</p>") > 0);
 
-    QVERIFY(quickView.getHtmlMessage(last).isEmpty() == false);
-    QVERIFY(quickView.getHtmlMessage(last).isNull() == false);
+    QVERIFY(quickView.mostVisitedEntriesHTML(last).isEmpty() == false);
+    QVERIFY(quickView.mostVisitedEntriesHTML(last).isNull() == false);
 }
 
 void tst_QuickView::render()
@@ -198,7 +198,7 @@ void tst_QuickView::verifyFilterCount()
     // at this point, we espect two results from QuickViewFilterModel
     // with the domains twitter.com and facebook.com
     QCOMPARE(model->rowCount(), 2);
-    QList<HistoryFrecencyEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QList<HistoryFrecencyEntry> mostVisited = quickView.mostVisitedEntries(6);
     QCOMPARE(mostVisited.count(), 2);
 
     manager->history().clear();
@@ -256,7 +256,7 @@ void tst_QuickView::verifyFilterFrecencies()
     // at this point, we espect two results from QuickViewFilterModel
     // with the domains twitter.com as most visited and facebook.com as second one
     QVERIFY(model->rowCount() == 2);
-    QList<HistoryFrecencyEntry> mostVisited = quickView.getLastHistoryEntries(6);
+    QList<HistoryFrecencyEntry> mostVisited = quickView.mostVisitedEntries(6);
     QVERIFY(mostVisited.count() == 2);
     cout << "most visited:" << mostVisited.first().url.toStdString() << ": " << mostVisited.first().frecency << endl;
     cout << "less visited:" << mostVisited.last().url.toStdString() << ": " << mostVisited.last().frecency << endl;

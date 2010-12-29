@@ -96,8 +96,9 @@ WebViewWithSearch::WebViewWithSearch(WebView *webView, QWidget *parent)
 
     if(startup == 3){
         QuickView quickView;
-        m_webView->setContent(quickView.render(6));
+        m_webView->setContent(quickView.render(QuickView::s_numberEntries));
     }
+
 
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);

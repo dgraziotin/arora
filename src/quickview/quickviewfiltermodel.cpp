@@ -305,7 +305,11 @@ bool QuickViewFilterModel::removeRows(int row, int count, const QModelIndex &par
 
 bool QuickViewFilterModel::isValid(const QUrl url) const
 {
-    return !url.isEmpty() && url.isValid() && !url.toString().contains(QString::fromLatin1("qrc:/")) && !url.toString().contains(QString::fromLatin1("about:"));
+    return !url.isEmpty()
+            && url.isValid()
+            && !url.toString().contains(QString::fromLatin1("qrc:/"))
+            && !url.toString().contains(QString::fromLatin1("about:"))
+            && !url.toString().contains(QString::fromLatin1("file://"));
 }
 
 int QuickViewFilterModel::frecencyScore(const QModelIndex &sourceIndex) const
