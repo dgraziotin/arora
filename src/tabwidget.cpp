@@ -818,6 +818,7 @@ QUrl TabWidget::guessUrlFromString(const QString &string)
 {
     OpenSearchManager *manager = ToolbarSearch::openSearchManager();
     QUrl url = manager->convertKeywordSearchToUrl(string);
+
     if (url.isValid())
         return url;
 
@@ -830,6 +831,7 @@ QUrl TabWidget::guessUrlFromString(const QString &string)
     if (url.scheme() == QLatin1String("about")
         && url.path() == QLatin1String("home"))
         url = QUrl(QLatin1String("qrc:/startpage.html"));
+
 
     // QUrl::isValid() is too much tolerant.
     // We actually want to check if the url conforms to the RFC, which QUrl::isValid() doesn't state.
