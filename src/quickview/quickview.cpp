@@ -28,6 +28,7 @@
 #include <quickviewfiltermodel.h>
 #include <QBuffer>
 #include <QByteArray>
+#include <QSettings>
 
 bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
 {
@@ -35,7 +36,7 @@ bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryF
     return a > b;
 }
 
-HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f, const QIcon &i):
+HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f, const QString &i):
     HistoryEntry(u, d, t), frecency(f), icon(i)  {}
 
 QList<HistoryFrecencyEntry> QuickView::mostVisitedEntries(int numberEntries)
@@ -60,7 +61,7 @@ QList<HistoryFrecencyEntry> QuickView::mostVisitedEntries(int numberEntries)
         QString finalTitle = url.host();
         int frecency =  index.data(HistoryFilterModel::FrecencyRole).toInt();
         QIcon icon = BrowserApplication::instance()->icon(url);
-        HistoryFrecencyEntry entry(finalUrl, datetime, finalTitle, frecency, icon);
+        HistoryFrecencyEntry entry(finalUrl, datetime, finalTitle, frecency, this->toBase64(icon));
         list.append(entry);
     }
     qSort(list.begin(), list.end(), compareHistoryFrecencyEntries);
@@ -77,12 +78,8 @@ QString QuickView::mostVisitedEntriesHTML(QList<HistoryFrecencyEntry> mostVisite
         QUrl entryUrl(mostVisitedEntries.at(i).url);
         QString finalUrl = entryUrl.scheme() + QString::fromLatin1("://") + entryUrl.host();
         QString finalTitle = entryUrl.host();
-        QIcon icon = mostVisitedEntries.at(i).icon;
-        QImage image(icon.pixmap(20,20).toImage());
-        QByteArray byteArray;
-        QBuffer buffer(&byteArray);
-        image.save(&buffer, "PNG"); // writes image into ba in PNG format.
-        QString entry = linkFormat.arg(finalUrl, finalTitle, QString::fromLatin1(byteArray.toBase64().data()));
+        QString icon = mostVisitedEntries.at(i).icon;
+        QString entry = linkFormat.arg(finalUrl, finalTitle, icon);
         htmlMessage += entry;
     }
     return htmlMessage;
@@ -133,3 +130,14 @@ QHash<QString, int> QuickView::getFrecencies(int numberEntries)
     }
     return list;
 }
+
+QString QuickView::toBase64(QIcon icon){
+    if (icon.isNull())
+        return QString();
+    QImage image(icon.pixmap(20,20).toImage());
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    image.save(&buffer, "PNG"); // writes image into ba in PNG format.
+    return QString::fromLatin1(byteArray.toBase64().data());
+}
+

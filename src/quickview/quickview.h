@@ -45,13 +45,13 @@ public:
      * @param datetime the datetime of the last visit - not used
      * @param title the title of the last visited page - not used
      * @param frecency the retrieved frecency of the entry
-     * @param icon the favicon.ico of the entry
+     * @param icon the favicon.ico of the entry in base64 format
      */
     HistoryFrecencyEntry(const QString &url,
                          const QDateTime &datetime = QDateTime(),
                          const QString &title = QString(),
                          const int frecency = -1,
-                         const QIcon &icon = QIcon());
+                         const QString &icon = QString());
 
     inline bool operator <(const HistoryFrecencyEntry &other) const {
         return frecency < other.frecency;
@@ -71,7 +71,7 @@ public:
     /**
      * Holds the favicon.ico file of the Entry
      */
-    QIcon icon;
+    QString icon;
 };
 
 /**
@@ -129,6 +129,15 @@ public:
      * Default number of most visited entries to be considered
      */
     static const int s_numberEntries = 8;
+
+
+private:
+    /**
+     * Converts a QIcon objects to its base64 representation
+     * @param icon a QIcon
+     * @return its representation in base64
+     */
+    QString toBase64(QIcon icon);
 };
 
 #endif // QUICKVIEW_H
