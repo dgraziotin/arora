@@ -169,8 +169,9 @@ void SettingsDialog::loadFromSettings()
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("urlloading"));
-    bool search = settings.value(QLatin1String("searchEngineFallback"), false).toBool();
-    searchEngineFallback->setChecked(search);
+    //FIXME:bodom_lx
+    //bool search = settings.value(QLatin1String("searchEngineFallback"), false).toBool();
+    //searchEngineFallback->setChecked(search);
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("downloadmanager"));
@@ -326,7 +327,7 @@ void SettingsDialog::saveToSettings()
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("urlloading"));
-    settings.setValue(QLatin1String("searchEngineFallback"), searchEngineFallback->isChecked());
+    //FIXME:bodom_lx settings.setValue(QLatin1String("searchEngineFallback"), searchEngineFallback->isChecked());
     settings.endGroup();
 
     // Appearance

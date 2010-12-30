@@ -838,7 +838,7 @@ QUrl TabWidget::guessUrlFromString(const QString &string)
 
     QSettings settings;
     settings.beginGroup(QLatin1String("urlloading"));
-    bool search = settings.value(QLatin1String("searchEngineFallback"), false).toBool();
+    bool search = true; //FIXME:bodom_lx //settings.value(QLatin1String("searchEngineFallback"), false).toBool();
 
     if (search) {
         url = ToolbarSearch::openSearchManager()->currentEngine()->searchUrl(string.trimmed());

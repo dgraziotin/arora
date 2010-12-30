@@ -32,8 +32,6 @@
 #include <qstyleoption.h>
 
 #include <qdebug.h>
-#include <qmessagebox.h>
-#include <toolbarsearch.h>
 
 LocationBar::LocationBar(QWidget *parent)
     : LineEdit(parent)
@@ -138,7 +136,6 @@ void LocationBar::mouseDoubleClickEvent(QMouseEvent *event)
 
 void LocationBar::keyPressEvent(QKeyEvent *event)
 {
-
     if (event->key() == Qt::Key_Escape && m_webView) {
         setText(QString::fromUtf8(m_webView->url().toEncoded()));
         selectAll();
@@ -148,19 +145,6 @@ void LocationBar::keyPressEvent(QKeyEvent *event)
     QString currentText = text().trimmed();
     if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         && !currentText.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) {
-
-        QString dot = QString::fromLatin1(".");
-        QString space = QString::fromLatin1(" ");
-        if ((currentText.indexOf(dot) == -1
-            || currentText.indexOf(space) != -1)
-            && !currentText.startsWith(QLatin1String("about:"), Qt::CaseInsensitive)
-            && !currentText.startsWith(QLatin1String("qrc:"), Qt::CaseInsensitive)){
-            ToolbarSearch* search = BrowserApplication::instance()->mainWindow()->toolbarSearch();
-            search->setText(currentText);
-            search->searchNow();
-            return;
-        }
-
         QString append;
         if (event->modifiers() == Qt::ControlModifier)
             append = QLatin1String(".com");
