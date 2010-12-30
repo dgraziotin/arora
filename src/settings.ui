@@ -155,23 +155,13 @@
         </widget>
        </item>
        <item row="4" column="0" colspan="3">
-        <widget class="QCheckBox" name="searchEngineFallback">
-         <property name="text">
-          <string>Use the default search engine as fallback when the URL given by the user is invalid</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3">
         <widget class="QCheckBox" name="enableAccessKeys">
          <property name="text">
           <string>Enable access keys</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="3">
+       <item row="5" column="0" colspan="3">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Downloads</string>
@@ -1060,7 +1050,6 @@
   <tabstop>homeLineEdit</tabstop>
   <tabstop>setHomeToCurrentPageButton</tabstop>
   <tabstop>expireHistory</tabstop>
-  <tabstop>searchEngineFallback</tabstop>
   <tabstop>downloadAsk</tabstop>
   <tabstop>downloadDestination</tabstop>
   <tabstop>downloadDirectoryButton</tabstop>

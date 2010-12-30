@@ -68,10 +68,11 @@
 #include <qpointer.h>
 #include <qurl.h>
 #include <qdatetime.h>
+#include <browsermainwindow.h>
 
 class AutoFillManager;
 class BookmarksManager;
-class BrowserMainWindow;
+//class BrowserMainWindow;
 class CookieJar;
 class DownloadManager;
 class HistoryManager;

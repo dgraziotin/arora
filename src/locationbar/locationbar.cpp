@@ -32,7 +32,6 @@
 #include <qstyleoption.h>
 
 #include <qdebug.h>
-#include <qmessagebox.h>
 
 LocationBar::LocationBar(QWidget *parent)
     : LineEdit(parent)
@@ -137,7 +136,6 @@ void LocationBar::mouseDoubleClickEvent(QMouseEvent *event)
 
 void LocationBar::keyPressEvent(QKeyEvent *event)
 {
-
     if (event->key() == Qt::Key_Escape && m_webView) {
         setText(QString::fromUtf8(m_webView->url().toEncoded()));
         selectAll();
