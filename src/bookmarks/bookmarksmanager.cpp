@@ -275,7 +275,7 @@ BookmarksModel *BookmarksManager::bookmarksModel()
         m_bookmarkModel = new BookmarksModel(this, this);
     return m_bookmarkModel;
 }
-
+/*
 void BookmarksManager::importBookmarks()
 {
     QStringList supportedFormats;
@@ -336,7 +336,7 @@ void BookmarksManager::exportBookmarks()
     if (!writer.write(fileName, m_bookmarkRootNode))
         QMessageBox::critical(0, tr("Export error"), tr("error saving bookmarks"));
 }
-
+*/
 RemoveBookmarksCommand::RemoveBookmarksCommand(BookmarksManager *m_bookmarkManagaer, BookmarkNode *parent, int row)
     : QUndoCommand(BookmarksManager::tr("Remove Bookmark"))
     , m_row(row)
