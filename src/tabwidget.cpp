@@ -945,7 +945,7 @@ void TabWidget::loadUrl(const QUrl &url, OpenUrlIn tab, const QString &title)
         loadUrlFromUser(url, title);
         return;
     }
-    if (!url.toString().compare(QString::fromLatin1("about:quickview")) == 0
+    if (url.toString().indexOf(QString::fromLatin1("about:quickview")) == 0
         || !url.isValid())
         return;
     WebView *webView = getView(tab, currentWebView());
