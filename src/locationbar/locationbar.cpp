@@ -32,6 +32,9 @@
 #include <qstyleoption.h>
 
 #include <qdebug.h>
+#include <toolbarsearch.h>
+#include <opensearchmanager.h>
+#include <opensearchengine.h>
 
 LocationBar::LocationBar(QWidget *parent)
     : LineEdit(parent)
@@ -145,6 +148,19 @@ void LocationBar::keyPressEvent(QKeyEvent *event)
     QString currentText = text().trimmed();
     if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         && !currentText.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) {
+
+        QString dot = QString::fromLatin1(".");
+        QString space = QString::fromLatin1(" ");
+
+
+        if (currentText.indexOf(QLatin1String("://")) == -1
+            && currentText.indexOf(dot) == -1 &&
+            currentText.indexOf(space) == -1){
+            QUrl url = ToolbarSearch::openSearchManager()->currentEngine()->searchUrl(currentText.trimmed());
+            setText(url.toString());
+            LineEdit::keyPressEvent(event);
+        }
+
         QString append;
         if (event->modifiers() == Qt::ControlModifier)
             append = QLatin1String(".com");
