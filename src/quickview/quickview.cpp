@@ -131,10 +131,11 @@ QHash<QString, int> QuickView::getFrecencies(int numberEntries)
     return list;
 }
 
-QString QuickView::toBase64(QIcon icon){
-    if (icon.isNull())
+QString QuickView::toBase64(QIcon icon)
+{
+    if(icon.isNull())
         return QString();
-    QImage image(icon.pixmap(20,20).toImage());
+    QImage image(icon.pixmap(20, 20).toImage());
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     image.save(&buffer, "PNG"); // writes image into ba in PNG format.
