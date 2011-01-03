@@ -2,10 +2,10 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-  quickview.h \
   quickviewfiltermodel.h \
+  quickview.h \
 
 SOURCES += \
-  quickview.cpp \
   quickviewfiltermodel.cpp \
+  quickview.cpp \
 

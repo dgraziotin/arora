@@ -127,10 +127,9 @@ void tst_QuickView::cleanup()
 
 void tst_QuickView::getMostVisited()
 {
-    QuickView quickView;
-    int desiredLastPages = 6;
-    QList<HistoryFrecencyEntry> last = quickView.mostVisitedEntries(desiredLastPages);
-    QVERIFY(last.size() <= desiredLastPages);
+    QuickView* quickView = BrowserApplication::quickView();
+    QList<HistoryFrecencyEntry> last = quickView->mostVisitedEntries();
+    QVERIFY(last.size() == 0);
 }
 
 void tst_QuickView::mostVisitedEntries()

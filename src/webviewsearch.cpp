@@ -95,10 +95,9 @@ WebViewWithSearch::WebViewWithSearch(WebView *webView, QWidget *parent)
     int startup = settings.value(QLatin1String("startupBehavior")).toInt();
 
     if(startup == 3){
-        QuickView quickView;
-        m_webView->setContent(quickView.render(QuickView::s_numberEntries));
+        QuickView* quickView = BrowserApplication::quickView();
+        m_webView->setContent(quickView->render());
     }
-
 
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
