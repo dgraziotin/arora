@@ -97,6 +97,7 @@ HistoryManager::HistoryManager(QObject *parent)
     , m_daysToExpire(30)
     , m_historyModel(0)
     , m_historyFilterModel(0)
+    , m_quickViewFilterModel(0)
     , m_historyTreeModel(0)
 {
     m_expiredTimer.setSingleShot(true);
@@ -115,7 +116,6 @@ HistoryManager::HistoryManager(QObject *parent)
     m_historyFilterModel = new HistoryFilterModel(m_historyModel, this);
     m_quickViewFilterModel = new QuickViewFilterModel(m_historyModel, this);
     m_historyTreeModel = new HistoryTreeModel(m_historyFilterModel, this);
-
     // QWebHistoryInterface will delete the history manager
     QWebHistoryInterface::setDefaultInterface(this);
     startFrecencyTimer();
@@ -428,6 +428,7 @@ void HistoryManager::save()
 void HistoryManager::refreshFrecencies()
 {
     m_historyFilterModel->recalculateFrecencies();
+    m_quickViewFilterModel->recalculateFrecencies();
     startFrecencyTimer();
 }
 

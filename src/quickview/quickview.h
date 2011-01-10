@@ -27,7 +27,6 @@
 #include <qsortfilterproxymodel.h>
 #include <qtimer.h>
 #include <qurl.h>
-#include <history.h>
 #include <historymanager.h>
 #include <qwebhistoryinterface.h>
 
@@ -80,10 +79,23 @@ public:
  * most visited sites (hosts or domains). The list is created in descending
  * order (first entry is the one with highest frecency).
  */
-class QuickView
+class QuickView : public QObject
 {
 
+Q_OBJECT
+
 public:
+    /**
+     * Default constructor for QObjects, it automatically sets
+     * numberEntries to 0
+     */
+    QuickView(QObject * parent=0);
+    /**
+     * Constructor for also setting the maximum number of entries
+     * to be computed by QuickView
+     * @param numberEntries the maximum number of entries
+     */
+    QuickView(int numberEntries = 0, QObject * parent=0);
     /**
      * Given a number n of entries, it retrieves the most n visited hosts
      * and encapsulates them in a QList of HistoryFrecencyEntry objects.
@@ -93,14 +105,14 @@ public:
      * @return a list of HistoryFrecencyEntry objects, order descending
      * @see HistoryFrecencyEntry
      */
-    QList<HistoryFrecencyEntry> mostVisitedEntries(int numberEntries);
+    QList<HistoryFrecencyEntry> mostVisitedEntries();
     /**
      * Converts a list of HistoryFrecencyEntry objects into a QString
      * encoded in HTML representing the objects.
      * @param mostVisitedEntries a list of the most
      * @return a QString representation in HTML of the most visited entries
      */
-    QString mostVisitedEntriesHTML(QList<HistoryFrecencyEntry> mostVisitedEntries);
+    QString mostVisitedEntriesHTML();
     /**
      * Loads a HTML file and replaces the place marker %1 in the HTML file with
      * the supplied QString. It returns the substituted HTML file as a QByteArray
@@ -116,20 +128,35 @@ public:
      * @param numberEntries how many HistoryFrecencyEntry must be generated
      * @return the complete QuickView HTML page, ready to be displayed
      */
-    QByteArray render(int numberEntries);
+    QByteArray render();
+
+    /**
+     * Getter for m_maxNumberEntries
+     */
+    int maxNumberEntries();
+
     /**
      * Right now it is used just for the Unittests. It returns a QHASH
      * of the frecencies of each most visited entry.
      * @param numberEntries how many entries must be considered
      * @return a hash table of URLs and frecencies
      */
-    QHash<QString, int> getFrecencies(int numberEntries);
+    QHash<QString, int> getFrecencies();
 
     /**
      * Default number of most visited entries to be considered
      */
-    static const int s_numberEntries = 8;
+    static const int s_defaultMaxNumberEntries = 8;
 
+public slots:
+    /**
+     * Convenience method that should be the only one public.
+     * Given a number of entries, it returns QuickView's HTML page with the
+     * most visited entries.
+     * @param numberEntries how many HistoryFrecencyEntry must be generated
+     * @return the complete QuickView HTML page, ready to be displayed
+     */
+    void calculate();
 
 private:
     /**
@@ -138,6 +165,27 @@ private:
      * @return its representation in base64
      */
     QString toBase64(QIcon icon);
+    /**
+     * QList of HistoryFrecencyEntry that holds the most visited
+     * entries
+     */
+    QList<HistoryFrecencyEntry> m_mostVisitedEntries;
+    /**
+     * Interval, in milliseconds, of the timer responsible
+     * to call the function to update QuickView's list
+     */
+    static const int s_msUpdateInterval = 5000;
+    /**
+     * Holds the maximum number of entries to be retrieved by
+     * QuickView
+     */
+    int m_maxNumberEntries;
+    /**
+     * Timer resposible for calling calculate() each s_msUpdateInterval
+     * milliseconds
+     */
+    QTimer* m_timer;
+
 };
 
 #endif // QUICKVIEW_H

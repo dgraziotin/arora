@@ -73,6 +73,7 @@
 #include "networkaccessmanager.h"
 #include "tabwidget.h"
 #include "webview.h"
+#include "quickview.h"
 
 #include <qbuffer.h>
 #include <qdesktopservices.h>
@@ -98,6 +99,7 @@ NetworkAccessManager *BrowserApplication::s_networkAccessManager = 0;
 BookmarksManager *BrowserApplication::s_bookmarksManager = 0;
 LanguageManager *BrowserApplication::s_languageManager = 0;
 AutoFillManager *BrowserApplication::s_autoFillManager = 0;
+QuickView *BrowserApplication::s_quickView = 0;
 
 BrowserApplication::BrowserApplication(int &argc, char **argv)
     : SingleApplication(argc, argv)
@@ -176,6 +178,7 @@ BrowserApplication::~BrowserApplication()
     delete s_languageManager;
     delete s_historyManager;
     delete s_autoFillManager;
+    delete s_quickView;
 }
 
 #if defined(Q_WS_MAC)
@@ -603,6 +606,18 @@ HistoryManager *BrowserApplication::historyManager()
     if (!s_historyManager)
         s_historyManager = new HistoryManager();
     return s_historyManager;
+}
+
+QuickView *BrowserApplication::quickView(int maxNumberEntries)
+{
+    if (!s_quickView){
+        s_quickView = new QuickView(maxNumberEntries);
+    }
+    if(s_quickView && s_quickView->maxNumberEntries() != maxNumberEntries){
+        delete s_quickView;
+        s_quickView = new QuickView(maxNumberEntries);
+    }
+    return s_quickView;
 }
 
 BookmarksManager *BrowserApplication::bookmarksManager()

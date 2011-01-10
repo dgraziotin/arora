@@ -956,8 +956,8 @@ void TabWidget::loadUrl(const QUrl &url, OpenUrlIn tab, const QString &title)
         if (index != -1)
             locationBar(index)->setText(QString::fromUtf8(url.toEncoded()));
         if(url.toString().compare(QString::fromLatin1("about:quickview")) == 0){
-            QuickView quickView;
-            webView->setContent(quickView.render(QuickView::s_numberEntries));
+            QuickView* quickView = BrowserApplication::quickView();
+            webView->setContent(quickView->render());
             emit setCurrentTitle(url.toString());
             return;
         }

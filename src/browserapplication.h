@@ -79,6 +79,7 @@ class HistoryManager;
 class NetworkAccessManager;
 class LanguageManager;
 class QLocalSocket;
+class QuickView;
 class BrowserApplication : public SingleApplication
 {
     Q_OBJECT
@@ -105,7 +106,7 @@ public:
     static BookmarksManager *bookmarksManager();
     static LanguageManager *languageManager();
     static AutoFillManager *autoFillManager();
-
+    static QuickView *quickView(int maxNumberEntries = 0);
     static QString installedDataDirectory();
     static QString dataFilePath(const QString &fileName);
 
@@ -150,6 +151,7 @@ private:
     void clean();
 
     static HistoryManager *s_historyManager;
+    static QuickView *s_quickView;
     static DownloadManager *s_downloadManager;
     static NetworkAccessManager *s_networkAccessManager;
     static BookmarksManager *s_bookmarksManager;
