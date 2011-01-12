@@ -96,6 +96,11 @@ private slots:
      */
     void verifyFilterFrecencies();
 
+    /**
+     * Verifies if the methods are fault tollerant
+     */
+    void verifyFaults();
+
 
 private:
     QList<HistoryEntry> m_history;
@@ -332,6 +337,24 @@ void tst_QuickView::verifyFilterFrecencies()
     QVERIFY(mostVisited.count() == 2);
     QVERIFY(mostVisited.first().url.compare(QString("http://twitter.com")) == 0);
     QVERIFY(mostVisited.last().url.compare(QString("http://facebook.com")) == 0);
+
+}
+
+void tst_QuickView::verifyFaults()
+{
+
+    HistoryManager* manager = BrowserApplication::historyManager();
+    QuickView* quickView = BrowserApplication::quickView();
+    quickView->calculate();
+
+    QVERIFY(quickView->mostVisitedEntries().size() == 0);
+    manager->addHistoryEntry(" ");
+    manager->addHistoryEntry("");
+    manager->addHistoryEntry("qrc:/home.html");
+    manager->addHistoryEntry("about:home");
+    manager->addHistoryEntry("fake data");
+    quickView->calculate();
+    QVERIFY(quickView->mostVisitedEntries().size() == 0);
 
 }
 
