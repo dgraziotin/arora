@@ -9,5 +9,7 @@ LIBS += -lgcov
 include(../autotests.pri)
 
 # Input
-SOURCES += tst_quickview.cpp
-HEADERS +=
+SOURCES += \
+    tst_quickview.cpp
+HEADERS += \
+    tst_quickview.h

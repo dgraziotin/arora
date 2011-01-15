@@ -60,9 +60,13 @@ public:
      * @return true if the host is contained in the hash table
      */
     inline bool historyContains(const QString &url) const {
-        return m_historyHash.contains(url);
+        QUrl newUrl(url);
+        return m_historyHash.contains(newUrl.host());
     }
 
+    /**
+     * @return the History position of the given URL
+     */
     int historyLocation(const QString &url) const;
 
     /**
@@ -117,7 +121,7 @@ public:
      * Helper method to check the validity of a url
      * @return true if the url is valid for our model
      */
-    bool isValid(const QUrl url) const;
+    static bool isValid(const QUrl url);
     /**
      * Forces to check the frecencies of the entries
      */

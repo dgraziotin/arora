@@ -31,25 +31,21 @@
 #include <QSettings>
 #include <QDebug>
 
-bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
-{
-    // for a reverse quickSort.
-    return a > b;
-}
-
 HistoryFrecencyEntry::HistoryFrecencyEntry(const QString &u, const QDateTime &d, const QString &t, const int f, const QString &i):
     HistoryEntry(u, d, t), frecency(f), icon(i)  {}
 
+/*
 QuickView::QuickView(QObject* parent)
     :QObject(parent)
 {
     QuickView::QuickView(0 , parent);
 }
+*/
 
 QuickView::QuickView(int numberEntries, QObject* parent)
-    :QObject(parent)
+    : QObject(parent)
 {
-    if (numberEntries > 0 && numberEntries != s_defaultMaxNumberEntries)
+    if(numberEntries > 0 && numberEntries != s_defaultMaxNumberEntries)
         m_maxNumberEntries = numberEntries;
     else
         m_maxNumberEntries = s_defaultMaxNumberEntries;
@@ -67,7 +63,8 @@ QList<HistoryFrecencyEntry> QuickView::mostVisitedEntries()
     return m_mostVisitedEntries;
 }
 
-void QuickView::calculate(){
+void QuickView::calculate()
+{
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
 
@@ -82,7 +79,7 @@ void QuickView::calculate(){
     for(int i = 0; i < numberEntries; i++) {
         QModelIndex index = model->index(i, 0, QModelIndex());
         QUrl url(index.data(HistoryModel::UrlRole).toString());
-        if (!url.isEmpty()){
+        if(QuickView::isValid(url)) {
             QDateTime datetime = index.data(HistoryModel::DateTimeRole).toDateTime();
             QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();
             QString finalTitle = url.host();
@@ -131,40 +128,29 @@ QByteArray QuickView::render()
     return quickViewPage(mostVisitedHtmlEntries);
 }
 
-
-QHash<QString, int> QuickView::getFrecencies()
+int QuickView::maxNumberEntries()
 {
-    QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
-    int rowCount = model->rowCount();
-
-    int numberEntries = m_maxNumberEntries;
-
-    if(rowCount < m_maxNumberEntries)
-        numberEntries = rowCount;
-
-    QHash<QString, int> list;
-
-    for(int i = 0; i < m_maxNumberEntries; i++) {
-        QModelIndex index = model->index(i, 0, QModelIndex());
-
-        QUrl url(index.data(HistoryModel::UrlRole).toString());
-        QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();
-        int frec = index.data(HistoryFilterModel::FrecencyRole).toInt();
-        list.insert(finalUrl, frec);
-    }
-    return list;
-}
-
-int QuickView::maxNumberEntries(){
     return m_maxNumberEntries;
 }
 
-QString QuickView::toBase64(QIcon icon){
-    if (icon.isNull())
+QString QuickView::toBase64(QIcon& icon)
+{
+    if(icon.isNull())
         return QString();
-    QImage image(icon.pixmap(20,20).toImage());
+    QImage image(icon.pixmap(20, 20).toImage());
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     image.save(&buffer, "PNG"); // writes image into ba in PNG format.
     return QString::fromLatin1(byteArray.toBase64().data());
+}
+
+bool QuickView::isValid(const QUrl& url)
+{
+    return  QuickViewFilterModel::isValid(url);
+}
+
+bool QuickView::compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
+{
+    // a has most frecency than b
+    return a > b;
 }

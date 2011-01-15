@@ -101,7 +101,7 @@ int QuickViewFilterModel::historyLocation(const QString &url) const
     if(!m_historyHash.contains(qUrl.host()))
         return 0;
 
-    return sourceModel()->rowCount() - m_historyHash.value(qUrl.host());
+    return sourceModel()->rowCount() - m_historyHash.value(qUrl.toString());
 }
 
 QVariant QuickViewFilterModel::data(const QModelIndex &index, int role) const
@@ -303,13 +303,13 @@ bool QuickViewFilterModel::removeRows(int row, int count, const QModelIndex &par
     return true;
 }
 
-bool QuickViewFilterModel::isValid(const QUrl url) const
+bool QuickViewFilterModel::isValid(const QUrl url)
 {
-    return !url.isEmpty()
-            && url.isValid()
-            && !url.toString().contains(QString::fromLatin1("qrc:/"))
-            && !url.toString().contains(QString::fromLatin1("about:"))
-            && !url.toString().contains(QString::fromLatin1("file://"));
+    QString urlString = url.toString();
+    return !urlString.contains(QString::fromLatin1(" "))
+           && !urlString.contains(QString::fromLatin1("qrc:"))
+           && !urlString.contains(QString::fromLatin1("about:"))
+           && url.isValid();
 }
 
 int QuickViewFilterModel::frecencyScore(const QModelIndex &sourceIndex) const
