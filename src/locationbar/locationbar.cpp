@@ -36,6 +36,8 @@
 #include <opensearchmanager.h>
 #include <opensearchengine.h>
 
+bool LocationBar::s_firstSelectAll = false;
+
 LocationBar::LocationBar(QWidget *parent)
     : LineEdit(parent)
     , m_webView(0)
@@ -64,6 +66,7 @@ LocationBar::LocationBar(QWidget *parent)
 
     updateTextMargins();
     setUpdatesEnabled(true);
+    LocationBar::resetFirstSelectAll();
 }
 
 void LocationBar::setWebView(WebView *webView)
@@ -129,6 +132,23 @@ void LocationBar::focusOutEvent(QFocusEvent *event)
     QLineEdit::focusOutEvent(event);
 }
 
+void LocationBar::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton){
+        if(!hasSelectedText() && !LocationBar::s_firstSelectAll){
+            LocationBar::s_firstSelectAll = true;
+            selectAll();
+        }
+    }else{
+        QLineEdit::mouseReleaseEvent(event);
+    }
+}
+
+void LocationBar::resetFirstSelectAll()
+{
+    LocationBar::s_firstSelectAll = false;
+}
+
 void LocationBar::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
@@ -148,7 +168,7 @@ void LocationBar::keyPressEvent(QKeyEvent *event)
     QString currentText = text().trimmed();
     if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         && !currentText.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) {
-
+        LocationBar::s_firstSelectAll = false;
         QString dot = QString::fromLatin1(".");
         QString space = QString::fromLatin1(" ");
 
