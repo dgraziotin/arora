@@ -82,20 +82,15 @@ public:
 class QuickView : public QObject
 {
 
-Q_OBJECT
+    Q_OBJECT
 
 public:
-    /**
-     * Default constructor for QObjects, it automatically sets
-     * numberEntries to 0
-     */
-    //QuickView(QObject * parent=0);
     /**
      * Constructor for also setting the maximum number of entries
      * to be computed by QuickView
      * @param numberEntries the maximum number of entries
      */
-    QuickView(int numberEntries = 0, QObject * parent=0);
+    QuickView(int numberEntries = 0, QObject * parent = 0);
     /**
      * Given a number n of entries, it retrieves the most n visited hosts
      * and encapsulates them in a QList of HistoryFrecencyEntry objects.
@@ -130,6 +125,10 @@ public:
      */
     QByteArray render();
 
+    /**
+     * @return true if the given URL is valid for QuickView mode
+     * @see QuickViewFilterModel::isValid()
+     */
     static bool isValid(const QUrl& url);
 
     /**
@@ -167,7 +166,7 @@ private:
      * @return true if a > b (a most visited)
      */
     static bool compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a,
-                                       const HistoryFrecencyEntry& b);
+            const HistoryFrecencyEntry& b);
     /**
      * QList of HistoryFrecencyEntry that holds the most visited
      * entries

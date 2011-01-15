@@ -43,9 +43,9 @@ QuickView::QuickView(QObject* parent)
 */
 
 QuickView::QuickView(int numberEntries, QObject* parent)
-    :QObject(parent)
+    : QObject(parent)
 {
-    if (numberEntries > 0 && numberEntries != s_defaultMaxNumberEntries)
+    if(numberEntries > 0 && numberEntries != s_defaultMaxNumberEntries)
         m_maxNumberEntries = numberEntries;
     else
         m_maxNumberEntries = s_defaultMaxNumberEntries;
@@ -63,7 +63,8 @@ QList<HistoryFrecencyEntry> QuickView::mostVisitedEntries()
     return m_mostVisitedEntries;
 }
 
-void QuickView::calculate(){
+void QuickView::calculate()
+{
 
     QuickViewFilterModel* model = BrowserApplication::historyManager()->quickViewFilterModel();
 
@@ -78,7 +79,7 @@ void QuickView::calculate(){
     for(int i = 0; i < numberEntries; i++) {
         QModelIndex index = model->index(i, 0, QModelIndex());
         QUrl url(index.data(HistoryModel::UrlRole).toString());
-        if (QuickView::isValid(url)){
+        if(QuickView::isValid(url)) {
             QDateTime datetime = index.data(HistoryModel::DateTimeRole).toDateTime();
             QString finalUrl = url.scheme() + QString::fromLatin1("://") + url.host();
             QString finalTitle = url.host();
@@ -127,14 +128,16 @@ QByteArray QuickView::render()
     return quickViewPage(mostVisitedHtmlEntries);
 }
 
-int QuickView::maxNumberEntries(){
+int QuickView::maxNumberEntries()
+{
     return m_maxNumberEntries;
 }
 
-QString QuickView::toBase64(QIcon& icon){
-    if (icon.isNull())
+QString QuickView::toBase64(QIcon& icon)
+{
+    if(icon.isNull())
         return QString();
-    QImage image(icon.pixmap(20,20).toImage());
+    QImage image(icon.pixmap(20, 20).toImage());
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     image.save(&buffer, "PNG"); // writes image into ba in PNG format.
@@ -143,10 +146,7 @@ QString QuickView::toBase64(QIcon& icon){
 
 bool QuickView::isValid(const QUrl& url)
 {
-    return  !url.toString().contains(QString::fromLatin1(" ")) && url.isValid();
-            //&& !url.toString().contains(QString::fromLatin1("qrc:/"))
-            //&& !url.toString().contains(QString::fromLatin1("about:"))
-            //&& !url.toString().contains(QString::fromLatin1("file://"));
+    return  QuickViewFilterModel::isValid(url);
 }
 
 bool QuickView::compareHistoryFrecencyEntries(const HistoryFrecencyEntry& a, const HistoryFrecencyEntry& b)
