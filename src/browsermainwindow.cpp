@@ -171,7 +171,8 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
     m_bookmarksToolbar->setMaximumHeight(19);
 
     QWidget *w = new QWidget(this);
-    w->setMaximumHeight(0);
+    //w->setMaximumHeight(0);
+    w->setMinimumHeight(13); // <- OS X tab widget style bug, pt.2
     layout->addWidget(w); // <- OS X tab widget style bug
 #else
     addToolBarBreak();
